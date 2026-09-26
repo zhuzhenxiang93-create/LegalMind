@@ -1,5 +1,5 @@
 {
-  "mode": "Demo / Precomputed Mode",
+  "mode": "MOCK API CONTRACT PREVIEW / Precomputed Classification",
   "case_id": "clear-theft",
   "classification_origin": "Illustrative manually authored scores; not checkpoint predictions",
   "candidate_charges": [
@@ -18,23 +18,19 @@
   ],
   "retrieved_cases": [
     {
-      "id": "SYN-003",
-      "charge": "盗窃",
-      "text": "秘密拿走他人手机，未使用暴力，返还手机，取得被害人谅解。",
-      "months": 5,
-      "fine": 1000,
-      "evidence_id": "SYN-003",
-      "score": 14.8292,
-      "origin": "synthetic"
-    },
-    {
-      "id": "SYN-001",
-      "charge": "盗窃",
-      "text": "商店柜台秘密拿走手机，价值5000元，事后返还并退赔，取得谅解。",
-      "months": 6,
+      "id": "SYN-006",
+      "charge": "抢夺",
+      "text": "突然夺走手中的物品，双方拉扯手机，事后退赔。",
+      "months": 9,
       "fine": 2000,
-      "evidence_id": "SYN-001",
-      "score": 12.7292,
+      "evidence_id": "SYN-006",
+      "score": 0.8333333333333334,
+      "source_scores": {
+        "bm25": 1.2032554149627686,
+        "vector": 0.6853276491165161,
+        "rrf": 0.03076923076923077,
+        "reranker": 0.8333333333333334
+      },
       "origin": "synthetic"
     },
     {
@@ -44,7 +40,29 @@
       "months": 8,
       "fine": 3000,
       "evidence_id": "SYN-002",
-      "score": 8.0624,
+      "score": 0.6666666666666666,
+      "source_scores": {
+        "bm25": 7.949793815612793,
+        "vector": 0.7193700671195984,
+        "rrf": 0.03200204813108039,
+        "reranker": 0.6666666666666666
+      },
+      "origin": "synthetic"
+    },
+    {
+      "id": "SYN-003",
+      "charge": "盗窃",
+      "text": "秘密拿走他人手机，未使用暴力，返还手机，取得被害人谅解。",
+      "months": 5,
+      "fine": 1000,
+      "evidence_id": "SYN-003",
+      "score": 0.5,
+      "source_scores": {
+        "bm25": 9.448464393615723,
+        "vector": 0.7120888233184814,
+        "rrf": 0.03200204813108039,
+        "reranker": 0.5
+      },
       "origin": "synthetic"
     }
   ],
@@ -83,33 +101,32 @@
     "legal_basis": [],
     "analogous_cases": [
       {
-        "claim": "秘密拿走他人手机，未使用暴力，返还手机，取得被害人谅解。",
+        "claim": "Synthetic demonstration case: 突然夺走手中的物品，双方拉扯手机，事后退赔。",
         "evidence_ids": [
-          "SYN-003"
+          "SYN-006"
         ]
       },
       {
-        "claim": "商店柜台秘密拿走手机，价值5000元，事后返还并退赔，取得谅解。",
-        "evidence_ids": [
-          "SYN-001"
-        ]
-      },
-      {
-        "claim": "趁店员离开取走电子产品，价值6000元，主动退赔损失。",
+        "claim": "Synthetic demonstration case: 趁店员离开取走电子产品，价值6000元，主动退赔损失。",
         "evidence_ids": [
           "SYN-002"
+        ]
+      },
+      {
+        "claim": "Synthetic demonstration case: 秘密拿走他人手机，未使用暴力，返还手机，取得被害人[NAME_REDACTED]。",
+        "evidence_ids": [
+          "SYN-003"
         ]
       }
     ],
     "sentencing_assessment": [],
     "missing_information": [
-      "核实价格认定、行为人年龄及当地数额标准",
-      "核实退赔和谅解材料",
-      "核验法条官方正文与指定日期的有效版本"
+      "核验法条官方正文与指定日期的有效版本",
+      "补充行为方式、金额与关键证据"
     ],
     "confidence": "low",
     "requires_manual_review": true,
-    "refusal_reason": "演示法条摘要尚未完成来源与时效核验，暂不生成法律或量刑结论。"
+    "refusal_reason": "合成接口测试输出：缺少已核验法条，保留法律结论。"
   },
   "checks": [
     {
@@ -125,7 +142,7 @@
     {
       "name": "Evidence Grounded",
       "status": "pass",
-      "detail": "Synthetic excerpts copied with IDs; semantic correctness not assessed"
+      "detail": "Citation membership checked; semantic correctness not assessed"
     },
     {
       "name": "Statute Source Verified",
@@ -160,9 +177,9 @@
       "detail": "2 candidate charge partitions"
     },
     {
-      "name": "Case retrieval",
-      "status": "live",
-      "detail": "BM25 · Chinese character bigrams · 3 synthetic matches"
+      "name": "Hybrid retrieval",
+      "status": "mock_api_contract",
+      "detail": "BM25 + neural Dense → RRF → neural Reranker · 3 matches"
     },
     {
       "name": "Statute lookup",
@@ -171,8 +188,8 @@
     },
     {
       "name": "Grounded output",
-      "status": "deterministic",
-      "detail": "Extractive case summaries · legal abstention"
+      "status": "mock_api_contract",
+      "detail": "qwen-plus · Evidence Packet · live_api"
     },
     {
       "name": "Output validation",
@@ -181,11 +198,164 @@
     }
   ],
   "evidence_ids": [
-    "SYN-001",
     "SYN-002",
-    "SYN-003"
+    "SYN-003",
+    "SYN-006"
   ],
-  "elapsed_ms": 0.8,
+  "retrieval_trace": {
+    "bm25": [
+      {
+        "case_id": "SYN-001",
+        "rank": 1,
+        "score": 10.886604309082031
+      },
+      {
+        "case_id": "SYN-003",
+        "rank": 2,
+        "score": 9.448464393615723
+      },
+      {
+        "case_id": "SYN-002",
+        "rank": 3,
+        "score": 7.949793815612793
+      },
+      {
+        "case_id": "SYN-004",
+        "rank": 4,
+        "score": 3.2469959259033203
+      },
+      {
+        "case_id": "SYN-006",
+        "rank": 5,
+        "score": 1.2032554149627686
+      }
+    ],
+    "dense": [
+      {
+        "case_id": "SYN-004",
+        "rank": 1,
+        "score": 0.8498116731643677
+      },
+      {
+        "case_id": "SYN-002",
+        "rank": 2,
+        "score": 0.7193700671195984
+      },
+      {
+        "case_id": "SYN-003",
+        "rank": 3,
+        "score": 0.7120888233184814
+      },
+      {
+        "case_id": "SYN-001",
+        "rank": 4,
+        "score": 0.7023346424102783
+      },
+      {
+        "case_id": "SYN-006",
+        "rank": 5,
+        "score": 0.6853276491165161
+      }
+    ],
+    "rrf": [
+      {
+        "case_id": "SYN-001",
+        "rank": 1,
+        "score": 0.032018442622950824
+      },
+      {
+        "case_id": "SYN-004",
+        "rank": 2,
+        "score": 0.032018442622950824
+      },
+      {
+        "case_id": "SYN-003",
+        "rank": 3,
+        "score": 0.03200204813108039
+      },
+      {
+        "case_id": "SYN-002",
+        "rank": 4,
+        "score": 0.03200204813108039
+      },
+      {
+        "case_id": "SYN-006",
+        "rank": 5,
+        "score": 0.03076923076923077
+      }
+    ],
+    "reranker": [
+      {
+        "case_id": "SYN-006",
+        "rank": 1,
+        "score": 0.8333333333333334
+      },
+      {
+        "case_id": "SYN-002",
+        "rank": 2,
+        "score": 0.6666666666666666
+      },
+      {
+        "case_id": "SYN-003",
+        "rank": 3,
+        "score": 0.5
+      },
+      {
+        "case_id": "SYN-004",
+        "rank": 4,
+        "score": 0.3333333333333333
+      },
+      {
+        "case_id": "SYN-001",
+        "rank": 5,
+        "score": 0.16666666666666666
+      }
+    ],
+    "timings": {
+      "bm25_ms": 1.33,
+      "dense_ms": 4.79,
+      "rrf_ms": 0.03,
+      "reranker_ms": 0.41
+    },
+    "rrf_k": 60,
+    "charge_filter": [
+      "抢夺",
+      "盗窃"
+    ],
+    "status": "mock_api_contract",
+    "embedding_model": "text-embedding-v4",
+    "reranker_model": "qwen3-rerank",
+    "index_initialization_ms": 0.01,
+    "provider": "Alibaba Cloud Bailian"
+  },
+  "generation": {
+    "status": "mock_api_contract",
+    "model": "qwen-plus",
+    "validation": {
+      "schema_valid": true,
+      "valid": true,
+      "missing_legal_basis": false,
+      "unknown_evidence_ids": [],
+      "wrong_evidence_type_ids": [],
+      "statute_validity_errors": {},
+      "privacy_hits": {
+        "identity_card": 0,
+        "mobile": 0,
+        "bank_card": 0,
+        "birth_date": 0,
+        "plate": 0,
+        "organization_code": 0,
+        "address": 0,
+        "name": 0
+      },
+      "analyzed_without_support": false,
+      "claim_coverage": 1.0,
+      "attempts": 1,
+      "fallback_used": false
+    }
+  },
+  "elapsed_ms": 10.58,
   "requires_manual_review": true,
-  "disclaimer": "Research / decision-support prototype, not legal advice."
+  "disclaimer": "Research / decision-support prototype, not legal advice.",
+  "execution_mode": "mock_api_contract"
 }

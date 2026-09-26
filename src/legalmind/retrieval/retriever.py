@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import time
+
 from legalmind.retrieval.fusion import deduplicate_cases, reciprocal_rank_fusion
 from legalmind.retrieval.index import HybridIndex
 from legalmind.retrieval.reranker import Reranker
@@ -38,25 +40,57 @@ class HybridRetriever:
         candidate_k: int | None = None,
         final_k: int | None = None,
     ) -> list[SearchHit]:
+        hits, _ = self.search_with_trace(query, predicted_labels, candidate_k, final_k)
+        return hits
+
+    def search_with_trace(
+        self,
+        query: str,
+        predicted_labels: set[str] | None = None,
+        candidate_k: int | None = None,
+        final_k: int | None = None,
+    ) -> tuple[list[SearchHit], dict]:
         candidate_k = int(candidate_k or self.candidate_k)
         final_k = int(final_k or self.final_k)
         labels = self._canonical_labels(predicted_labels)
-
-        if labels:
-            bm25 = self.index.search_bm25_filtered(query, labels, candidate_k)
-            dense = self.index.search_vector_filtered(query, labels, candidate_k)
-        else:
-            bm25 = self.index.search_bm25(query, candidate_k)
-            dense = self.index.search_vector(query, candidate_k)
-
-        fused = reciprocal_rank_fusion(
-            {"bm25": bm25, "vector": dense},
-            rrf_k=self.rrf_k,
+        timings = {}
+        phase = time.perf_counter()
+        bm25 = (
+            self.index.search_bm25_filtered(query, labels, candidate_k)
+            if labels
+            else self.index.search_bm25(query, candidate_k)
         )
+        timings["bm25_ms"] = (time.perf_counter() - phase) * 1000
+        phase = time.perf_counter()
+        dense = (
+            self.index.search_vector_filtered(query, labels, candidate_k)
+            if labels
+            else self.index.search_vector(query, candidate_k)
+        )
+        timings["dense_ms"] = (time.perf_counter() - phase) * 1000
+
+        def snapshot(hits):
+            return [
+                {"case_id": h.case_id, "rank": rank, "score": h.score}
+                for rank, h in enumerate(hits, 1)
+            ]
+
+        trace = {"bm25": snapshot(bm25), "dense": snapshot(dense)}
+        phase = time.perf_counter()
+        fused = reciprocal_rank_fusion({"bm25": bm25, "vector": dense}, rrf_k=self.rrf_k)
         candidates = fused[: self.fusion_top_k]
+        trace["rrf"] = snapshot(candidates)
+        timings["rrf_ms"] = (time.perf_counter() - phase) * 1000
+        phase = time.perf_counter()
         if self.reranker:
             candidates = self.reranker.rerank(query, candidates, self.rerank_top_k)
-        return deduplicate_cases(candidates, final_k)
+        timings["reranker_ms"] = (time.perf_counter() - phase) * 1000
+        selected = deduplicate_cases(candidates, final_k)
+        trace["reranker"] = snapshot(candidates) if self.reranker else []
+        trace["timings"] = {key: round(value, 2) for key, value in timings.items()}
+        trace["rrf_k"] = self.rrf_k
+        trace["charge_filter"] = sorted(labels)
+        return selected, trace
 
     def search_by_accusations(
         self,

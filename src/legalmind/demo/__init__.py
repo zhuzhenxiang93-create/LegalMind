@@ -1,1 +1,1 @@
-"""CPU-only recruiting demo; no model inference is implied."""
+"""Bailian Hybrid API demo with explicitly illustrative classification scores."""

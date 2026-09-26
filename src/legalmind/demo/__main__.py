@@ -3,7 +3,9 @@ import argparse
 from legalmind.demo.assets import CASES
 from legalmind.demo.service import AnalyzeRequest, analyze_lite
 
-parser = argparse.ArgumentParser(description="LegalMind-RAG Demo / Precomputed Mode")
+parser = argparse.ArgumentParser(
+    description="LegalMind-RAG Bailian API / Precomputed Classification"
+)
 parser.add_argument("--case", choices=[c["id"] for c in CASES], default="clear-theft")
 parser.add_argument("--as-of-date", default="2026-01-01")
 args = parser.parse_args()

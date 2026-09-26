@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import math
 import os
 from typing import Any, Protocol
 
@@ -20,13 +21,15 @@ class CrossEncoderReranker:
         model_name: str,
         max_length: int = 2048,
         batch_size: int = 8,
+        device: str | None = None,
     ):
         from sentence_transformers import CrossEncoder
 
         self.model = CrossEncoder(
             model_name,
             max_length=max_length,
-            trust_remote_code=True,
+            trust_remote_code=False,
+            device=device,
         )
         self.batch_size = batch_size
 
@@ -95,13 +98,25 @@ class APIReranker:
         response = self.client.post(self.url, json=payload)
         response.raise_for_status()
         results = response.json().get("results", [])
-        reranked: list[SearchHit] = []
+        if not isinstance(results, list) or len(results) != payload["top_n"]:
+            raise ValueError("Reranker result count does not match top_n")
+        seen = set()
+        checked = []
         for item in results:
-            index = int(item["index"])
-            if index < 0 or index >= len(hits):
-                raise ValueError(f"Reranker returned an invalid document index: {index}")
-            hit = hits[index]
+            index = item["index"]
             score = float(item["relevance_score"])
+            if (
+                type(index) is not int
+                or not 0 <= index < len(hits)
+                or index in seen
+                or not math.isfinite(score)
+            ):
+                raise ValueError("Reranker returned invalid indexes or scores")
+            seen.add(index)
+            checked.append((index, score))
+        reranked: list[SearchHit] = []
+        for index, score in checked:
+            hit = hits[index]
             hit.source_scores["rrf"] = hit.score
             hit.source_scores["reranker"] = score
             hit.score = score

@@ -1,17 +1,18 @@
 from __future__ import annotations
 
-import math
-import re
 import time
-from collections import Counter
 from datetime import date
 from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
 from legalmind.data.privacy import redact_privacy
-from legalmind.demo.assets import CASES, RECORDS, SOURCE_URL, STATUTES
-from legalmind.generation.contracts_v2 import LegalAnalysisV1
+from legalmind.demo.assets import CASES, SOURCE_URL, STATUTES
+from legalmind.demo.bailian import BailianSettings
+from legalmind.demo.hybrid import retrieve_hybrid
+from legalmind.generation.analysis_service import GroundedAnalysisService
+from legalmind.generation.contracts_v2 import EvidenceItemV1, EvidencePacketV1, LegalAnalysisV1
+from legalmind.generation.openai_generator import OpenAICompatibleGenerator
 
 
 class AnalyzeRequest(BaseModel):
@@ -33,37 +34,11 @@ class DemoResponse(BaseModel):
     checks: list[dict]
     trace: list[dict]
     evidence_ids: list[str]
+    retrieval_trace: dict
+    generation: dict
     elapsed_ms: float
     requires_manual_review: bool
     disclaimer: str
-
-
-def tokens(text: str) -> list[str]:
-    clean = re.sub(r"\s+", "", text)
-    return [clean[i : i + 2] for i in range(max(0, len(clean) - 1))]
-
-
-def retrieve(fact: str, charges: list[str], limit: int = 3) -> list[dict]:
-    """BM25 over the charge-constrained synthetic corpus, computed on every request."""
-    docs = [r for r in RECORDS if r["charge"] in charges]
-    if not docs:
-        return []
-    bags = [Counter(tokens(r["text"])) for r in docs]
-    lengths = [sum(b.values()) for b in bags]
-    avg = sum(lengths) / len(docs)
-    scores = []
-    for row, bag, length in zip(docs, bags, lengths):
-        score = 0.0
-        for token in set(tokens(fact)):
-            df = sum(token in b for b in bags)
-            idf = math.log(1 + (len(docs) - df + 0.5) / (df + 0.5))
-            tf = bag[token]
-            score += idf * tf * 2.5 / (tf + 1.5 * (0.25 + 0.75 * length / avg))
-        if score > 0:
-            scores.append(
-                {**row, "evidence_id": row["id"], "score": round(score, 4), "origin": "synthetic"}
-            )
-    return sorted(scores, key=lambda r: (-r["score"], r["id"]))[:limit]
 
 
 def citation_check(analysis: LegalAnalysisV1, allowed: set[str]) -> bool:
@@ -73,6 +48,7 @@ def citation_check(analysis: LegalAnalysisV1, allowed: set[str]) -> bool:
 
 def analyze_lite(request: AnalyzeRequest) -> DemoResponse:
     start = time.perf_counter()
+    settings = BailianSettings.from_env()
     fixture = next((c for c in CASES if c["fact"] == request.fact.strip()), None)
     privacy = redact_privacy(request.fact)
     scores = fixture["scores"] if fixture else []
@@ -87,7 +63,7 @@ def analyze_lite(request: AnalyzeRequest) -> DemoResponse:
     ]
     enough = fixture is not None and fixture["id"] != "insufficient-facts"
     charges = [name for name, _ in scores] if enough else []
-    hits = retrieve(privacy.text, charges)
+    hits, retrieval_trace = retrieve_hybrid(privacy.text, charges)
     statutes = [
         {
             **s,
@@ -119,6 +95,37 @@ def analyze_lite(request: AnalyzeRequest) -> DemoResponse:
         if fixture
         else "自定义输入没有预计算分类结果。",
     )
+    generation = {
+        "status": "skipped",
+        "model": settings.generation_model,
+        "reason": "Unsupported custom input has no classifier result",
+    }
+    if fixture:
+        packet = EvidencePacketV1(
+            request_id=f"demo-{fixture['id']}",
+            fact=privacy.text,
+            as_of_date=request.as_of_date.isoformat(),
+            predicted_accusations=[c["charge"] for c in candidates],
+            evidence=[
+                EvidenceItemV1(
+                    evidence_id=h["id"],
+                    evidence_type="case",
+                    title=h["id"],
+                    summary="Synthetic demonstration case: " + h["text"],
+                    accusations=[h["charge"]],
+                )
+                for h in hits
+            ],
+        )
+        generated, report = GroundedAnalysisService(
+            OpenAICompatibleGenerator(settings.generation_config())
+        ).analyze(packet)
+        analysis = generated
+        generation = {
+            "status": "fallback" if report.get("fallback_used") else "live_api",
+            "model": settings.generation_model,
+            "validation": report,
+        }
     valid = citation_check(analysis, allowed)
     checks = [
         {"name": "Schema Valid", "status": "pass", "detail": "LegalAnalysisV1 · Pydantic"},
@@ -130,7 +137,7 @@ def analyze_lite(request: AnalyzeRequest) -> DemoResponse:
         {
             "name": "Evidence Grounded",
             "status": "pass" if hits else "pending",
-            "detail": "Synthetic excerpts copied with IDs; semantic correctness not assessed",
+            "detail": "Citation membership checked; semantic correctness not assessed",
         },
         {
             "name": "Statute Source Verified",
@@ -165,9 +172,11 @@ def analyze_lite(request: AnalyzeRequest) -> DemoResponse:
             "detail": f"{len(charges)} candidate charge partitions",
         },
         {
-            "name": "Case retrieval",
-            "status": "live",
-            "detail": f"BM25 · Chinese character bigrams · {len(hits)} synthetic matches",
+            "name": "Hybrid retrieval",
+            "status": retrieval_trace["status"],
+            "detail": f"BM25 + neural Dense → RRF → neural Reranker · {len(hits)} matches"
+            if charges
+            else "Skipped: insufficient candidate charges",
         },
         {
             "name": "Statute lookup",
@@ -176,8 +185,8 @@ def analyze_lite(request: AnalyzeRequest) -> DemoResponse:
         },
         {
             "name": "Grounded output",
-            "status": "deterministic",
-            "detail": "Extractive case summaries · legal abstention",
+            "status": generation["status"],
+            "detail": f"{settings.generation_model} · Evidence Packet · {generation['status']}",
         },
         {
             "name": "Output validation",
@@ -186,7 +195,7 @@ def analyze_lite(request: AnalyzeRequest) -> DemoResponse:
         },
     ]
     return DemoResponse(
-        mode="Demo / Precomputed Mode",
+        mode="Bailian API Demo / Precomputed Classification",
         case_id=fixture["id"] if fixture else None,
         classification_origin="Illustrative manually authored scores; not checkpoint predictions",
         candidate_charges=candidates,
@@ -196,6 +205,8 @@ def analyze_lite(request: AnalyzeRequest) -> DemoResponse:
         checks=checks,
         trace=trace,
         evidence_ids=sorted(allowed),
+        retrieval_trace=retrieval_trace,
+        generation=generation,
         elapsed_ms=round((time.perf_counter() - start) * 1000, 2),
         requires_manual_review=True,
         disclaimer="Research / decision-support prototype, not legal advice.",

@@ -35,7 +35,8 @@ retrieval = [
 generation = ["openai>=1.60"]
 dev = ["pytest>=8.0", "ruff>=0.8"]
 sentencing = ["joblib>=1.4", "scikit-learn>=1.4", "scipy>=1.12"]
-demo = ["fastapi>=0.115", "uvicorn>=0.30", "httpx>=0.27"]
+demo-hybrid = ["fastapi>=0.115", "uvicorn>=0.30", "httpx>=0.27", "openai>=1.60", "python-dotenv>=1.0", "faiss-cpu>=1.9", "rank-bm25>=0.2.2"]
+demo = ["fastapi>=0.115", "uvicorn>=0.30", "httpx>=0.27", "openai>=1.60", "python-dotenv>=1.0", "faiss-cpu>=1.9", "rank-bm25>=0.2.2"]
 api = ["fastapi>=0.115", "uvicorn>=0.30"]
 
 [project.scripts]
@@ -45,7 +46,7 @@ legalmind = "legalmind.cli:main"
 where = ["src"]
 
 [tool.pytest.ini_options]
-pythonpath = ["src"]
+pythonpath = ["src", "."]
 testpaths = ["tests"]
 
 [tool.ruff]

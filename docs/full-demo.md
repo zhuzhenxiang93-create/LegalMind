@@ -1,15 +1,15 @@
 # Full Demo
 
-Full Mode reuses `LegalMindPipeline`, the BF16 classifier, charge-partitioned retrieval, temporal statute filtering, Evidence Packet and OpenAI-compatible generation. This release exercised mocked provider/component tests and the CPU Lite flow; it did not run the external BF16 checkpoint or paid generation service.
+Full Mode reuses `LegalMindPipeline`, the BF16 classifier, strict Hybrid retrieval, temporal statute filtering, Evidence Packet and OpenAI-compatible generation. This release exercised mocked provider/component tests through mocked HTTP transport; it did not run the external BF16 checkpoint or paid generation service.
 
 ## Assets
 
 Provide your licensed Qwen3-4B base, the matching `checkpoint-7500` adapter, **its** 202-label mapping and **its** Validation-calibrated thresholds. Do not reuse thresholds from the historical 10K classifier. The adapter must save the `score` head.
 
-Provide locally built `ChargePartitionedRetriever` and `LexicalBM25Index` statute directories. Only trusted local indexes should be loaded: historical index serialization uses pickle. The statute index must contain verified official-source metadata and applicable effective/expiry dates. Merely downloading an official page does not establish verified legal validity.
+Provide locally built `HybridIndex` and `LexicalBM25Index` statute directories. Only trusted local indexes should be loaded: historical index serialization uses pickle. The statute index must contain verified official-source metadata and applicable effective/expiry dates. Merely downloading an official page does not establish verified legal validity.
 
 ```bash
-python -m pip install -e '.[demo,train,retrieval,generation,sentencing]'
+python -m pip install -e '.[demo-hybrid,train,retrieval,generation,sentencing]'
 cp .env.example .env
 # Edit .env with local asset locations and provider credentials.
 set -a
@@ -35,17 +35,13 @@ python scripts/build_statute_bm25.py --help
 
 The public release includes no case corpus, weights or distributable adapter. Data provenance remains `legacy_local_file_unverified`; resolve licensing before any redistribution.
 
-## Experimental Hybrid
+## Default Hybrid
 
-`configs/pipeline/hybrid.experimental.yaml` demonstrates the existing BM25 + Dense → RRF → Reranker route. Configure its index and credentials and invoke:
+`LEGALMIND_HYBRID_INDEX` must point to a saved HybridIndex built with `embedding_provider: api`, the configured `text-embedding-v4` model and 1,024 dimensions. Rebuild old local/Qwen embedding indexes: vectors from different models cannot be mixed. Configure Bailian as described in [Hybrid setup](hybrid-demo.md). Full Mode uses `qwen3-rerank` and `qwen-plus` through the same backend credentials.
+The default `full_config()` and `configs/pipeline/default.yaml` require Hybrid and a reranker. Missing components raise an explicit error, with no sparse fallback. The legacy filename `hybrid.experimental.yaml` is retained for compatibility; it now also uses strict Hybrid. Research configurations can still explicitly opt into older fallback behavior, but the recruiting default cannot.
 
-```bash
-legalmind analyze --config configs/pipeline/hybrid.experimental.yaml \
-  --fact "匿名化案件事实" --as-of-date 2026-01-01
-```
-
-This is a research configuration route and may explicitly degrade to sparse retrieval. Inspect `initialization_warnings`; do not label a fallback as successful Hybrid. Real Hybrid E2E needs external assets and remains unverified in this release.
+A full Qwen/private-corpus run still requires separately provided weights, index and credentials. Offline tests verify the HTTP contracts and retrieval algorithms using synthetic provider responses. Live API inference and private-corpus quality remain unverified.
 
 ## Docker boundary
 
-`docker compose up --build` runs CPU Demo Lite only. To containerize Full Mode, extend the backend with inference dependencies and mount your private assets read-only; inject `.env` at runtime. The provided Lite image deliberately includes no GPU runtime or credentials. Full container execution has not been tested.
+`docker compose up --build` runs the Bailian API Demo with `.env` injected at runtime. The image needs no local retrieval weights or GPU. To containerize Full Mode, add inference dependencies and mount private assets read-only. Container execution has not been verified locally.

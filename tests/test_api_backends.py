@@ -3,6 +3,7 @@ from __future__ import annotations
 from types import SimpleNamespace
 
 import numpy as np
+import pytest
 
 from legalmind.retrieval.embedding import OpenAIEmbeddingBackend
 from legalmind.retrieval.reranker import APIReranker
@@ -98,3 +99,19 @@ def test_api_reranker_maps_service_indices(monkeypatch) -> None:
     assert [item.case_id for item in results] == ["b", "a"]
     assert results[0].source_scores == {"rrf": 0.2, "reranker": 0.9}
     assert client.request[1]["instruct"] == "legal relevance"
+
+
+@pytest.mark.parametrize(
+    "indexes,scores",
+    [([0, 0], [0.2, 0.3]), ([0, 2], [0.2, 0.3]), ([0, 1], [float("nan"), 0.3]), ([0], [0.3])],
+)
+def test_reranker_rejects_corrupt_provider_results(indexes, scores):
+    from unittest.mock import Mock
+
+    client = Mock()
+    client.post.return_value.json.return_value = {
+        "results": [{"index": i, "relevance_score": s} for i, s in zip(indexes, scores)]
+    }
+    backend = APIReranker("qwen3-rerank", "UNUSED", "UNUSED", client=client)
+    with pytest.raises(ValueError):
+        backend.rerank("query", [make_hit("a", "a", 0.1), make_hit("b", "b", 0.2)], 2)

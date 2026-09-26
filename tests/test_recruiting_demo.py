@@ -11,6 +11,8 @@ from legalmind.generation.analysis_service import GroundedAnalysisService
 from legalmind.generation.contracts_v2 import EvidencePacketV1, LegalAnalysisV1
 from legalmind.generation.grounding_validator import validate_grounded_analysis
 
+pytestmark = pytest.mark.usefixtures("bailian_mock")
+
 client = TestClient(app)
 
 
@@ -19,7 +21,7 @@ def test_presets_are_explicit_and_valid(case):
     response = client.post("/api/analyze", json={"fact": case["fact"], "as_of_date": "2026-01-01"})
     assert response.status_code == 200
     data = response.json()
-    assert data["mode"] == "Demo / Precomputed Mode"
+    assert data["mode"] == "Bailian API Demo / Precomputed Classification"
     assert data["trace"][0]["status"] == "precomputed"
     assert data["requires_manual_review"] is True
     assert not any(

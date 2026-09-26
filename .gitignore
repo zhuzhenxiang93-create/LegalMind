@@ -58,3 +58,7 @@ dist/
 *.log
 *.tar.gz
 *.zip
+
+# Live provider evaluations stay local for review.
+demo/evaluation/live-results.json
+demo/evaluation/live-outputs.jsonl

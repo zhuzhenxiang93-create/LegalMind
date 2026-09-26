@@ -1,4 +1,7 @@
 {
+  "execution_mode": "mock_api_contract",
+  "live_api_verified": false,
+  "generation_fallback_count": 0,
   "scope": "Synthetic/demo contract and fail-closed regression; not a human-reviewed legal benchmark",
   "samples": 30,
   "unique_facts": 24,
@@ -11,13 +14,13 @@
   "manual_review_trigger_rate": 1.0,
   "pipeline_success_rate": 1.0,
   "custom_input_no_prediction_rate": 1.0,
-  "latency_ms_median": 0.04,
-  "latency_ms_p95": 0.86,
+  "latency_ms_median": 0.14500000000000002,
+  "latency_ms_p95": 10.55,
   "limitations": [
     "All samples expect abstention because statutes are unverified or inputs unsupported.",
     "100% review is deliberate; this does not measure useful legal answering or review selectivity.",
     "Citation membership does not establish semantic support.",
-    "CPU in-process latency excludes HTTP, UI, GPU and external LLM latency.",
+    "Mock timing is not provider latency; live timing excludes UI and BF16 classification.",
     "Preset scores are manually authored illustrations, not trained-model outputs."
   ]
 }

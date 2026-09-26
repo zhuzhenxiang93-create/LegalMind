@@ -18,31 +18,16 @@ Provenance: project-owner supplied training/run record, associated with Qwen3-4B
 
 The BF16 audit loader/evaluator changes have been integrated. The best checkpoint is recorded as `checkpoint-7500`; final update count is 7,530. Full Mode requires a matching label mapping and calibrated thresholds rather than silently selecting a historical calibration file.
 
-## Synthetic/demo E2E regression
+## Mock API contract regression
 
-Run `python scripts/evaluate_demo.py` after installing the package. Inputs: [30 requests](../demo/evaluation/e2e_cases.jsonl), comprising 24 distinct facts: three presets at three dates, plus 21 custom/edited/privacy/adversarial inputs. This is a contract and fail-closed regression set, not a legal benchmark.
+Run `python scripts/evaluate_demo.py --mock-provider`. The [30 requests](../demo/evaluation/e2e_cases.jsonl) contain 24 distinct facts: three presets at three dates and 21 edited/custom/privacy/adversarial inputs. The HTTP mock intercepts the real SDK/client requests; filtering, BM25, vector search, RRF, index mapping, generation parsing and validators execute normally.
 
-| Measure | Observed result |
-|---|---:|
-| Pipeline success | 30/30 |
-| Pydantic response validity | 30/30 |
-| Citation whitelist validity, by response | 30/30 |
-| Unknown Evidence IDs | 0 / 18 cited IDs |
-| Expected abstention | 30/30 |
-| Manual review | 30/30 |
-| Custom inputs without fabricated predictions | 21/21 |
+See [results.json](../demo/evaluation/results.json) for current results. Outputs explicitly identify `mock_api_contract` execution. All inputs expect legal abstention because no demo statute is verified. Empty-citation responses pass membership vacuously, so the report includes a citation count and a generation-fallback count. These rates do not measure semantic grounding, model inference quality or useful legal answering. Mock latency is not Bailian latency.
 
-All items expect legal abstention because statute metadata is unverified or input classification is unsupported. These rates do **not** establish useful legal answering, balanced abstention quality, review selectivity, classifier accuracy, semantic grounding or production reliability. Empty-citation responses pass the membership check vacuously; the citation denominator above makes this explicit. Negative tests separately inject unknown citations, inconsistent abstention and missing legal support.
+Tests also exercise missing keys, embedding/reranker outages with no sparse fallback, provider-error sanitization, invalid citations and one-repair generation fallback. CI makes no paid provider calls. The frontend is built and exercised using visibly labelled mock responses, plus missing-configuration checks.
 
-Timing values are saved in [results.json](../demo/evaluation/results.json). They measure in-process CPU Lite only, excluding HTTP, UI, model loading, LoRA inference and external LLM latency. They must not be quoted as Full Mode latency.
-
-## Validation scope
-
-- Existing research and new demo tests: recorded in the release report.
-- Frontend: production build plus real browser interaction with three presets and mobile overflow check.
-- Full BF16 and real API/Hybrid E2E: not run; weights, indexes and credentials absent.
-- Docker: configuration supplied, execution unverified because Docker is unavailable locally.
+For a live run, configure `.env` and run `python scripts/evaluate_demo.py`. This consumes provider quota and writes separate ignored `live-results.json` and `live-outputs.jsonl`. A local live run was not possible because no credentials were supplied. Full BF16/private-corpus inference and Docker execution also remain unverified.
 
 ## Next evaluation gates
 
-Obtain licensed provenance, run corrected independent BF16 Test, verify statute snapshots, label charge-confusion/abstention examples with legal reviewers, and compare real Hybrid with the default retriever using human relevance judgments. Keep schema/citation metrics separate from semantic/legal correctness.
+Run the live API contract check, then corrected independent BF16 Test, verify statute snapshots, collect legal-reviewer relevance labels and compare Hybrid against BM25. Keep structural correctness, model quality, useful answering and abstention quality as separate measures.

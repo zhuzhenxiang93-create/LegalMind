@@ -1,19 +1,16 @@
 # Runtime architecture
 
-| Mode | Classification | Case retrieval | Generation | Verified in this release |
+| Mode | Classification | Retrieval | Generation | Verification |
 |---|---|---|---|---|
-| Lite | Exact preset match → illustrative scores | Live character-bigram BM25 over six synthetic records | Extractive template and legal abstention | API, browser, regression |
-| Full default | Qwen3-4B BF16 LoRA | Existing charge-partitioned BM25 and factual reranking | OpenAI-compatible API | Component/mock tests only; external assets absent |
-| Research Hybrid | BF16 classifier | BM25 + Dense, RRF, Reranker | Configured generation | Component tests; real E2E pending |
+| Bailian API Demo (`lite`) | Exact preset → illustrative scores | BM25 + API Dense → RRF → API Reranker over six synthetic records | Qwen-Plus with Evidence Packet | Offline mock HTTP contract tests |
+| Full | Qwen3-4B BF16 LoRA | Same strict Hybrid chain over a matching private index | Qwen-Plus with case/statute evidence | Components tested; private assets and live credentials absent |
 
-The React/Vite frontend talks to FastAPI through a same-origin `/api` proxy. Lite has no model or API dependency. `/api/capabilities` checks Full asset configuration, not operational readiness. `/api/analyze` accepts `fact`, `as_of_date` and `mode`. Pydantic bounds text to 5–8,000 characters and validates dates. Requests are not persisted.
+React/Vite talks to FastAPI through a same-origin `/api` proxy. Only the backend reads `.env`. `/api/capabilities` checks configuration and asset presence, not provider operational readiness. `/api/analyze` validates 5–8,000 characters and an as-of date. Application code does not persist submitted facts; configured provider calls send redacted query/evidence text to Bailian.
 
-Lite scores are authored illustrations rather than measured classifier probabilities. Matching is exact: modifying a preset disables fixture scores. Case retrieval uses BM25 after filtering the synthetic corpus to candidate charges. Raw BM25 values are ranking scores, not normalized confidence.
+The API Demo loads corpus vectors once per process/configuration; each supported query makes fresh embedding, reranking and generation requests. Both BM25 and Dense apply charge filtering before recall. RRF merges ranks, then the API reranks fused documents. Each stage's ranking, score and timing appears in the trace. Missing candidate charges explicitly skip retrieval. Custom inputs have no fabricated classifier output and skip generation.
 
-The Full adapter verifies required configuration, then loads the existing pipeline lazily. Default inference saves no additional model copies. The research sentencing baseline is disabled in the default Full configuration. OpenAI-compatible generation consumes the existing Evidence Packet and output schema.
+Demo statute summaries lack verified source/date metadata and are excluded from the generation packet. This requires low-confidence abstention and manual review. The validator checks schema, citation membership/type and supplied statute metadata; it cannot establish semantic entailment or legal correctness. Provider generation errors or invalid drafts cause an explicitly labelled fallback. Retrieval errors return 503 and never silently select sparse-only results.
 
-Checks enforce schema, citation membership, citation types, supplied source/date metadata and some privacy patterns. They do not prove that a generated statement follows logically from the cited source. The generation validator now also rejects `analyzed` responses with no legal basis. A provider error produces safe abstention instead of leaking provider payloads.
+Full Mode preflights the matching API embedding model/dimensions in its index manifest and requires the BF16 assets and statute index. Loading is lazy and cached; restart after changes. The traditional sentencing baseline is disabled by default.
 
-Lite article summaries have no certified effective-date snapshot. The UI therefore shows pending source/date checks, withholds legal/sentencing conclusions and requests review. A complete legal-answer demonstration requires verified statutes and a reviewed evaluation set.
-
-The trace is an execution summary, not hidden model reasoning. Lite explicitly labels precomputed classification, live BM25, deterministic generation and live output checks. It does not claim Dense, RRF or Reranker execution.
+The production service never imports the offline mock provider. Stored test outputs and screenshots are explicitly labelled mock API contract previews, with live provider validation pending.

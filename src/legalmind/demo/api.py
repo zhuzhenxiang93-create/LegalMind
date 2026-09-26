@@ -3,7 +3,9 @@ from __future__ import annotations
 from fastapi import FastAPI, HTTPException
 
 from legalmind.demo.assets import CASES
+from legalmind.demo.bailian import BailianSettings
 from legalmind.demo.full import analyze_full, full_config
+from legalmind.demo.hybrid import HybridUnavailable
 from legalmind.demo.service import AnalyzeRequest, analyze_lite
 
 app = FastAPI(title="LegalMind-RAG", version="1.0.0")
@@ -24,15 +26,30 @@ def capabilities():
     try:
         full_config()
         configured = True
-    except ValueError:
+    except (ValueError, HybridUnavailable):
         configured = False
-    return {"lite": True, "full_configured": configured, "full_runtime_verified": False}
+    try:
+        settings = BailianSettings.from_env()
+        missing = None
+    except HybridUnavailable as error:
+        settings = None
+        missing = str(error)
+    return {
+        "lite": True,
+        "bailian_configured": settings is not None,
+        "configuration_message": missing,
+        "full_configured": configured,
+        "full_runtime_verified": False,
+    }
 
 
 @app.post("/api/analyze")
 def analyze(request: AnalyzeRequest):
     if request.mode == "lite":
-        return analyze_lite(request).model_dump(mode="json")
+        try:
+            return analyze_lite(request).model_dump(mode="json")
+        except HybridUnavailable as error:
+            raise HTTPException(status_code=503, detail=str(error)) from None
     try:
         return {"mode": "Full Mode", "result": analyze_full(request)}
     except ValueError as error:

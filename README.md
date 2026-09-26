@@ -2,7 +2,7 @@
 
 **Evidence-Grounded Criminal Case Analysis with Qwen3-4B LoRA, Hybrid Retrieval and Controlled LLM Generation**
 
-A research prototype that turns anonymized case facts into candidate charges, traceable case evidence and a reviewable structured response. **The default retrieval is charge-aware BM25; Hybrid is experimental.**
+A research prototype that turns anonymized case facts into candidate charges, traceable case evidence and a reviewable structured response. **Default retrieval: charge-aware BM25 + neural Dense → RRF → neural Reranker.**
 
 ![Training cases](https://img.shields.io/badge/training_cases-120K%2B-254c76)
 ![Charge labels](https://img.shields.io/badge/charge_labels-202-254c76)
@@ -10,7 +10,7 @@ A research prototype that turns anonymized case facts into candidate charges, tr
 ![Outputs](https://img.shields.io/badge/outputs-evidence--grounded-557b74)
 [![CI](https://github.com/zhuzhenxiang93-create/RAG/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/zhuzhenxiang93-create/RAG/actions/workflows/ci.yml)
 
-![LegalMind-RAG evidence workspace — actual Demo Lite screenshot](demo/assets/hero.png)
+![LegalMind-RAG evidence workspace — mock API contract preview — no live provider verification](demo/assets/hero.png)
 
 [Try the demo](#quick-start) · [Architecture](docs/architecture.md) · [Evaluation](docs/evaluation.md) · [Full Mode](docs/full-demo.md)
 
@@ -18,7 +18,7 @@ A research prototype that turns anonymized case facts into candidate charges, tr
 
 Charge classification alone leaves the reviewer without supporting evidence. Free-form generation makes it difficult to inspect where a claim came from. This prototype connects domain classification, charge-constrained retrieval, explicit Evidence IDs and validation, while exposing uncertainty and missing information.
 
-**For recruiters:** try the three scenarios, inspect Pipeline Trace, then open Evaluation. This takes about three minutes. No GPU, API key or private dataset is needed for Demo Lite.
+**For recruiters:** try the three scenarios, inspect Pipeline Trace, then open Evaluation. This takes about three minutes. The API Demo requires a configured Alibaba Cloud Bailian API key and endpoints. It needs no GPU, classifier checkpoint or private dataset. API calls consume your provider quota.
 
 ## Product Demo
 
@@ -26,7 +26,9 @@ Charge classification alone leaves the reviewer without supporting evidence. Fre
 - **Competing charges:** theft / snatching / robbery; inspect candidate ambiguity and missing facts.
 - **Insufficient facts:** see abstention and a request for more information.
 
-The UI explicitly displays **Demo / Precomputed Mode**. Scores are manually authored illustrative fixtures, **not outputs from the trained checkpoint**. BM25 retrieval, Pydantic parsing, Evidence-ID checks and the review decision execute locally. Generation is deterministic. Edited/free-text inputs never inherit preset scores.
+The UI explicitly displays **Bailian API / precomputed classification**. Classification scores are manually authored illustrations, not checkpoint predictions. Retrieval calls `text-embedding-v4` and `qwen3-rerank`; generation calls `qwen-plus`. BM25 and RRF execute locally. Edited/free-text inputs do not inherit preset scores and require Full Mode for classifier inference.
+
+**Verification status:** HTTP contract tests use a mock provider. No Bailian key was available for this release, so live API availability, paid inference quality and latency remain unverified. Saved example outputs and result screenshots are explicitly marked mock contract fixtures.
 
 Demo statute summaries have a recorded official-source URL but have **not** been verified against a dated authoritative text. All Lite scenarios therefore withhold legal/sentencing conclusions and require review. This is a transparent walkthrough of the workflow, not a validated legal answer demo.
 
@@ -45,29 +47,30 @@ Demo statute summaries have a recorded official-source URL but have **not** been
 flowchart TD
     A[Anonymized case facts] --> B[BF16 LoRA classifier]
     B --> C[Charge-aware case retrieval]
-    C --> D[Default: partitioned BM25]
-    C -. Optional .-> E[Experimental: Dense + BM25 / RRF / Reranker]
-    D --> F[Evidence Packet]
-    E --> F
+    C --> D[BM25 + neural Dense]
+    D --> E[RRF fusion + neural Reranker]
+    E --> F[Evidence Packet]
     G[Dated statute retrieval] --> F
     F --> H[OpenAI-compatible generation]
     H --> I[Pydantic + citation + statute validation]
     I --> J[Structured response / manual review]
 ```
 
-Lite replaces classification with preset fixtures and generation with extractive deterministic output. Full Mode uses the existing research pipeline; it requires external assets. See [runtime boundaries](docs/architecture.md).
+The API Demo replaces classification with preset fixtures; retrieval and generation use Bailian APIs. Full Mode uses the existing research pipeline; it requires external assets. See [runtime boundaries](docs/architecture.md).
 
 ## Quick Start
 
-### Demo Lite: one command with Docker
+### API Demo with Docker
 
 ```bash
 git clone https://github.com/zhuzhenxiang93-create/RAG.git LegalMind-RAG
 cd LegalMind-RAG
+cp .env.example .env
+# Fill DASHSCOPE_API_KEY, DASHSCOPE_BASE_URL and DASHSCOPE_RERANK_URL in .env.
 docker compose up --build
 ```
 
-Open **http://localhost:8080**. Docker configuration is supplied; container startup was not executed in the build environment because Docker was unavailable. Native backend, frontend build and browser flow were tested.
+Open **http://localhost:8080**. Docker configuration is supplied; container startup was not executed in the build environment because Docker was unavailable. The backend, frontend build and mock-provider browser flow are tested separately.
 
 ### Native development
 
@@ -76,7 +79,9 @@ Python 3.10+ and Node 22+:
 ```bash
 python -m venv .venv
 source .venv/bin/activate
-python -m pip install -e '.[demo]'
+python -m pip install -e '.[demo-hybrid]'
+cp .env.example .env
+# Configure the three required Bailian values in backend .env.
 uvicorn legalmind.demo.api:app --host 127.0.0.1 --port 8000
 ```
 
@@ -98,7 +103,7 @@ python -m legalmind.demo --case clear-theft --as-of-date 2026-01-01
 
 Input: a manually constructed account of an adult secretly taking a shop's phone, later returning it, compensating the loss and obtaining a forgiveness statement.
 
-Output includes candidate charge fixture scores, three synthetic BM25 matches, unverified article summaries, cited Evidence IDs, a six-stage trace and a clear manual-review decision. Inspect the [complete output](demo/expected_outputs/clear-theft.json). Historical sentences and fines in Lite are invented interface examples; the system does not recommend them for the input case.
+Output includes candidate charge fixture scores, three synthetic Hybrid matches, unverified article summaries, cited Evidence IDs, a six-stage trace and a clear manual-review decision. Inspect the [mock contract output](demo/expected_outputs/clear-theft.json). Historical sentences and fines in Lite are invented interface examples; the system does not recommend them for the input case.
 
 ## Charge Classification
 
@@ -120,15 +125,25 @@ Dynamic padding, token-length bucketing and gradient checkpointing are implement
 
 ## Retrieval
 
-**Default Full Mode:** charge-partitioned BM25 with existing factual reranking and up to three case matches. **Lite:** live character-bigram BM25 over six synthetic records, constrained to demo candidate charges.
+**Default in Demo and Full Mode:** hard charge filtering → BM25 + neural Dense → RRF (k=60) → neural cross-encoder Reranker → up to three deduplicated cases. Missing Hybrid components produce an explicit error; sparse fallback is disabled in the default configurations.
 
-**Experimental:** BM25 + Dense → RRF → Reranker. Implemented in `src/legalmind/retrieval/` and covered by component tests. No real model/index/API E2E was available in this release environment, so `configs/pipeline/hybrid.experimental.yaml` is optional and is not advertised as a validated default. Synthetic or stub retrieval tests do not establish real legal relevance.
+| Stage | Default implementation |
+|---|---|
+| Sparse recall | Local BM25, Chinese character bigrams |
+| Dense recall | Bailian `text-embedding-v4`, 1,024 dimensions |
+| Fusion | Local RRF, k=60 |
+| Reranking | Bailian `qwen3-rerank` |
+| Grounded generation | Bailian `qwen-plus` |
+
+Both recall branches apply the same charge filter. The UI displays all four rankings and distinct scores. Missing configuration or retrieval failures return an explicit error without sparse fallback. Six synthetic records illustrate the pipeline; their invented sentences and fines are not predictions.
+
+See [Bailian configuration and interface contracts](docs/hybrid-demo.md). The Embedding/Chat base URL and full Reranker URL are configured separately, using endpoints from the same regional console. Full Mode requires a prebuilt index made with the matching embedding model and dimensions.
 
 ## Grounded Generation
 
-Full Mode builds an Evidence Packet and calls an OpenAI-compatible API (`qwen-plus` by default). Configure `GENERATION_BASE_URL`, `GENERATION_API_KEY` and `GENERATION_MODEL`. Standard request fields are used unless a research configuration explicitly enables provider-specific `top_k`.
+The API Demo and Full Mode build an Evidence Packet and call `qwen-plus` with JSON output and thinking disabled. Configure `GENERATION_MODEL` to change the compatible generation model. Credentials stay on the backend. Demo statute summaries are excluded from generation evidence because they are unverified; legal conclusions must therefore be withheld.
 
-Invalid output gets at most one repair. Provider errors or repeated validation failures return an explicit low-confidence fallback. Historical [generation SFT](docs/experiments/generation-sft.md) is outside the default pipeline. The traditional sentencing model remains a research baseline / sanity check, disabled by default.
+Invalid output gets at most one repair. Provider errors or repeated validation failures return an explicit low-confidence fallback, visibly labelled `fallback`. Historical [generation SFT](docs/experiments/generation-sft.md) is outside the default pipeline. The traditional sentencing model remains disabled by default.
 
 ## Safety & Reliability
 
@@ -151,15 +166,15 @@ Invalid output gets at most one repair. Provider errors or repeated validation f
 
 **Independent BF16 test evaluation pending corrected evaluator run.** No corrected independent BF16 test artifact was found in the audited branches. Do not present these Validation numbers as Test results.
 
-The [30-request synthetic demo regression](demo/evaluation/results.json) checks schema, citations and fail-closed behavior. It is **not a human-reviewed legal benchmark**. All requests are expected to abstain; review selectivity and useful legal answering are not measured. See [evaluation scope and results](docs/evaluation.md).
+The [30-request mock API contract regression](demo/evaluation/results.json) checks schema, citations and fail-closed behavior. It is **not a human-reviewed legal benchmark**. All requests are expected to abstain; review selectivity and useful legal answering are not measured. See [evaluation scope and results](docs/evaluation.md).
 
 ## Current vs Experimental
 
 | Component | Status |
 |---|---|
 | Qwen3-4B BF16 LoRA | Implemented; external checkpoint required |
-| Charge-aware BM25 | Default Full route; component-tested |
-| Hybrid / RRF / Reranker | Implemented, experimental; real E2E unverified |
+| Charge-aware BM25 + Dense | Default; Bailian API adapter; mock HTTP tests |
+| RRF / neural Reranker | Default; mock HTTP contract E2E tested |
 | Statute retrieval and temporal filters | Implemented; verified source metadata required |
 | Evidence Packet / OpenAI-compatible generation | Implemented; provider tests use mocks |
 | Pydantic / Evidence-ID whitelist | Implemented and regression-tested |
@@ -176,7 +191,7 @@ app/                    Frontend and backend container definitions
 src/legalmind/demo/     Lite service, FastAPI and strict Full Mode adapter
 src/legalmind/          Classification, retrieval, generation, data and baseline modules
 demo/                   Synthetic cases, expected outputs, screenshots and evaluation
-configs/                Research configurations; Hybrid is explicitly experimental
+configs/                Strict Hybrid defaults and research configurations
 docs/                   Architecture, evaluation, full reproduction and historical notes
 scripts/                Training, indexing and evaluation entry points
 tests/                  Component, contract and demo regression tests
@@ -191,19 +206,19 @@ Use [Full Mode setup](docs/full-demo.md) for the matching base model, adapter, l
 legalmind analyze --fact "匿名化案件事实……" --as-of-date 2026-01-01
 ```
 
-Full Mode fails explicitly if required assets are absent. Lite remains available independently.
+Full Mode fails explicitly if required assets are absent. API Demo needs the Bailian configuration but no classifier assets.
 
 ## Data Governance & Limitations
 
 **Training data is not redistributed by this repository.** The inherited CAIL-derived source is recorded as `legacy_local_file_unverified`; the source/license chain needs verification before redistribution or adapter release. Full model artifacts are not redistributed. Public demo cases are authored synthetic fixtures.
 
-The prototype is not deployed as a public production service. It lacks a human-reviewed legal benchmark, demonstrated legal-answer reliability, broad privacy guarantees, hosted GPU inference and live Hybrid E2E validation. The demo is intentionally conservative about statute provenance. Old documents under `reports/` and research notes describe historical runs; this README and the release audit define the recruiting release.
+The prototype is not deployed as a public production service. It lacks a human-reviewed legal benchmark, demonstrated legal-answer reliability, broad privacy guarantees, hosted GPU inference and live Bailian E2E validation. The demo is intentionally conservative about statute provenance. Old documents under `reports/` and research notes describe historical runs; this README and the release audit define the recruiting release.
 
 ## Roadmap
 
 - Re-run and publish corrected independent BF16 test artifacts.
 - Verify dated statute snapshots and evaluate useful answers as well as abstention.
-- Validate real Hybrid E2E against default BM25 on reviewed relevance judgments.
+- Evaluate Hybrid versus BM25 on human-reviewed relevance judgments.
 - Add long-text sliding-window inference and calibrated review thresholds.
 
 ## Disclaimer

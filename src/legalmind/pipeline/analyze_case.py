@@ -83,6 +83,15 @@ def build_pipeline(config: dict) -> LegalMindPipeline:
     elif retrieval_mode == "hybrid_rrf_rerank":
         initialization_warnings.append(f"hybrid_retrieval_index_missing:{hybrid_path}")
 
+    if (
+        retrieval_config.get("strict_hybrid")
+        and retrieval_mode == "hybrid_rrf_rerank"
+        and (not isinstance(retriever, HybridRetriever) or retriever.reranker is None)
+    ):
+        raise ValueError(
+            "Strict Hybrid requires a loaded dense/BM25 index and reranker; sparse fallback is disabled"
+        )
+
     # Keep the previous sparse routes only as explicit degradation paths.
     if (
         retriever is None

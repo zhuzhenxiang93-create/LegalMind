@@ -66,8 +66,8 @@ class GroundedAnalysisService:
                     "error": "generation_provider_unavailable",
                 }
             last_report = validate_generated_text(output, packet)
+            analysis = last_report.pop("analysis", None)
             if last_report.get("valid"):
-                analysis = last_report.pop("analysis")
                 return analysis, {**last_report, "attempts": attempt + 1, "fallback_used": False}
-        fallback = deterministic_fallback(packet, str(last_report.get("error", last_report)))
+        fallback = deterministic_fallback(packet, "generation_validation_failed")
         return fallback, {**last_report, "attempts": self.max_repairs + 1, "fallback_used": True}

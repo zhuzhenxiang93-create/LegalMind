@@ -8,7 +8,9 @@ class OpenAICompatibleGenerator:
     """Client for a separately deployed Qwen3.5 or compatible generation service."""
 
     def __init__(self, config: dict[str, Any]):
-        base_url = os.getenv(config.get("base_url_env", "GENERATION_BASE_URL"))
+        base_url = config.get("base_url") or os.getenv(
+            config.get("base_url_env", "GENERATION_BASE_URL")
+        )
         api_key = os.getenv(config.get("api_key_env", "GENERATION_API_KEY"), "EMPTY")
         if not base_url:
             raise ValueError(
@@ -32,6 +34,10 @@ class OpenAICompatibleGenerator:
         self.temperature = float(config.get("temperature", 0.7))
         self.top_p = float(config.get("top_p", 0.8))
         self.top_k = config.get("top_k")
+        self.extra_body = {}
+        if "enable_thinking" in config:
+            self.extra_body["enable_thinking"] = bool(config["enable_thinking"])
+        self.response_format = config.get("response_format")
         self.presence_penalty = float(config.get("presence_penalty", 1.5))
         self.timeout_seconds = float(config.get("timeout_seconds", 120))
 
@@ -46,7 +52,11 @@ class OpenAICompatibleGenerator:
         }
         if self.top_k is not None:
             payload["top_k"] = int(self.top_k)
+        payload.update(self.extra_body)
+        if self.response_format:
+            payload["response_format"] = self.response_format
         if self.client is not None:
+            options = {"response_format": self.response_format} if self.response_format else {}
             response = self.client.chat.completions.create(
                 model=self.model,
                 messages=payload["messages"],
@@ -54,7 +64,11 @@ class OpenAICompatibleGenerator:
                 temperature=self.temperature,
                 top_p=self.top_p,
                 presence_penalty=self.presence_penalty,
-                extra_body={"top_k": int(self.top_k)} if self.top_k is not None else {},
+                extra_body={
+                    **self.extra_body,
+                    **({"top_k": int(self.top_k)} if self.top_k is not None else {}),
+                },
+                **options,
             )
             content = response.choices[0].message.content
         else:

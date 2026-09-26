@@ -96,7 +96,7 @@ def validate_grounded_analysis(
 def validate_generated_text(value: str, packet: EvidencePacketV1) -> dict[str, Any]:
     try:
         analysis = parse_legal_analysis(value)
-    except (ValueError, ValidationError) as error:
-        return {"valid": False, "schema_valid": False, "error": str(error)}
+    except (ValueError, ValidationError):
+        return {"valid": False, "schema_valid": False, "error": "invalid_json_or_schema"}
     report = validate_grounded_analysis(analysis, packet)
     return {"schema_valid": True, "analysis": analysis, **report}

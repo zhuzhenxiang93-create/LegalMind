@@ -1,7 +1,7 @@
 source: data/processed_v2_1_1/train.jsonl
 output_dir: artifacts/indexes/cail2018-v2_1_1
 embedding_provider: api
-embedding_model: qwen3.7-text-embedding
+embedding_model: text-embedding-v4
 embedding_base_url_env: DASHSCOPE_BASE_URL
 embedding_api_key_env: DASHSCOPE_API_KEY
 embedding_api_batch_size: 20

@@ -103,10 +103,20 @@ class OpenAIEmbeddingBackend:
                 request["dimensions"] = self.dimensions
             response = self.client.embeddings.create(**request)
             batch = sorted(response.data, key=lambda item: item.index)
+            if [item.index for item in batch] != list(range(len(request["input"]))):
+                raise ValueError("Embedding service returned invalid indexes")
             rows.extend(item.embedding for item in batch)
         if len(rows) != len(texts):
             raise ValueError("Embedding service returned a vector count that does not match inputs")
-        return _normalize(np.asarray(rows, dtype=np.float32))
+        values = np.asarray(rows, dtype=np.float32)
+        if (
+            values.ndim != 2
+            or not np.isfinite(values).all()
+            or np.any(np.linalg.norm(values, axis=1) == 0)
+            or (self.dimensions is not None and values.shape[1] != self.dimensions)
+        ):
+            raise ValueError("Embedding service returned invalid vectors or dimensions")
+        return _normalize(values)
 
     def encode_documents(self, texts: list[str], batch_size: int) -> np.ndarray:
         return self._encode(texts, batch_size)
