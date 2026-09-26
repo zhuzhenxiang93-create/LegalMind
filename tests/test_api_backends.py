@@ -115,3 +115,13 @@ def test_reranker_rejects_corrupt_provider_results(indexes, scores):
     backend = APIReranker("qwen3-rerank", "UNUSED", "UNUSED", client=client)
     with pytest.raises(ValueError):
         backend.rerank("query", [make_hit("a", "a", 0.1), make_hit("b", "b", 0.2)], 2)
+
+
+def test_text_embedding_v4_respects_ten_text_batch_limit():
+    client = FakeEmbeddingClient()
+    backend = OpenAIEmbeddingBackend(
+        "text-embedding-v4", "UNUSED", "UNUSED", dimensions=2, client=client
+    )
+    values = backend.encode_documents(["example"] * 21, batch_size=64)
+    assert values.shape == (21, 2)
+    assert [len(r["input"]) for r in client.embeddings.requests] == [10, 10, 1]

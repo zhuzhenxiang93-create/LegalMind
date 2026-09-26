@@ -92,7 +92,9 @@ class OpenAIEmbeddingBackend:
 
     def _encode(self, texts: list[str], batch_size: int) -> np.ndarray:
         rows: list[list[float]] = []
-        effective_batch = max(1, min(batch_size, self.api_batch_size))
+        # Bailian text-embedding-v4 accepts at most ten texts per request.
+        model_batch_limit = 10 if self.model_name == "text-embedding-v4" else self.api_batch_size
+        effective_batch = max(1, min(batch_size, self.api_batch_size, model_batch_limit))
         for start in range(0, len(texts), effective_batch):
             request: dict[str, Any] = {
                 "model": self.model_name,

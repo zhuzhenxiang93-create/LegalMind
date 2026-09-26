@@ -22,7 +22,7 @@ References: [Embedding compatibility](https://help.aliyun.com/zh/model-studio/em
 
 ## Requests
 
-Embedding uses the OpenAI SDK with `model`, `input`, `dimensions`, and `encoding_format=float`. Returned indexes are checked and reordered; vectors are normalized. Demo corpus embeddings are cached once per process/configuration. Each supported query calls Embedding and Reranker again.
+Embedding uses the OpenAI SDK with `model`, `input`, `dimensions`, and `encoding_format=float`. `text-embedding-v4` requests are capped at ten texts per batch, including when loading older index metadata. Returned indexes are checked and reordered; vectors are normalized. Demo corpus embeddings are cached once per process/configuration. Each supported query calls Embedding and Reranker again.
 
 Reranker sends the flat JSON fields `model`, `query`, `documents`, `top_n`, `instruct`; it reads top-level `results` with `index` and `relevance_score`. Duplicate/out-of-range indexes, incomplete results and nonfinite scores are rejected. Provider scores remain distinct from BM25, cosine and RRF scores.
 

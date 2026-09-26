@@ -1,6 +1,6 @@
 # Bailian API update
 
-Current default: BM25 + Bailian `text-embedding-v4` → RRF → `qwen3-rerank` → `qwen-plus`. Provider credentials are backend-only. Validation: 164 Python tests passed; Ruff checks/format and frontend production build passed; three preset browser flows and missing-configuration 503 were checked, with no JavaScript errors or mobile overflow. The 30-request mock contract regression passed with no generation fallback. Tests use HTTP mocks; live API, BF16 assets and Docker execution remain unverified. See [Hybrid setup](hybrid-demo.md) and [evaluation](evaluation.md). The earlier release audit below records the superseded BM25/template baseline.
+Current default: BM25 + Bailian `text-embedding-v4` → RRF → `qwen3-rerank` → `qwen-plus`. Provider credentials are backend-only. Validation: 165 Python tests passed; Ruff checks/format and frontend production build passed; three preset browser flows and missing-configuration 503 were checked, with no JavaScript errors or mobile overflow. The 30-request mock contract regression passed with no generation fallback. Tests use HTTP mocks; live API, BF16 assets and Docker execution remain unverified. See [Hybrid setup](hybrid-demo.md) and [evaluation](evaluation.md). The earlier release audit below records the superseded BM25/template baseline.
 
 # Recruiting release audit — 2026-09-27
 
