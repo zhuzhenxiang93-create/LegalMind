@@ -8,8 +8,8 @@
 
 ## 2. 环境和 GPU 状态
 
-- 工作目录：`/root/autodl-tmp/LegalMind-RAG`
-- Conda：`/root/autodl-tmp/conda/envs/legalmind`
+- 工作目录：`/path/to/workspace/LegalMind-RAG`
+- Conda：`/path/to/workspace/conda/envs/legalmind`
 - Python 3.11.15，PyTorch 2.5.1+cu124，Transformers 5.14.1，PEFT 0.19.1
 - GPU：NVIDIA GeForce RTX 4090 D，24,564 MiB
 - v2 Full 启动观察：约 10.84 GiB 显存，GPU 利用率 100%
@@ -108,7 +108,7 @@ Prompt Smoke（20 条）：JSON 可解析率 0、Schema 通过率 0、罪名字�
 - `src/legalmind/pipeline/`：统一推理、降级、不确定性和引用校验
 - `configs/`、`scripts/`、`tests/`、`reports/`、`docs/interview/`
 
-备份：`/root/autodl-tmp/backups/legalmind_full_build_20260817T105521Z/project_code_before_build.tar.gz`，SHA256 `06908bdfcf6666acbfa9228bf07ee341ffb715ec4ba28b6f7f734a772ef31ee3`。
+备份：`/path/to/workspace/backups/legalmind_full_build_20260817T105521Z/project_code_before_build.tar.gz`，SHA256 `06908bdfcf6666acbfa9228bf07ee341ffb715ec4ba28b6f7f734a772ef31ee3`。
 
 ## 22. 数据构建命令
 
@@ -173,3 +173,4 @@ feat: build evidence-grounded LegalMind-RAG evaluation pipeline
 ```
 
 当前远程目录没有 `.git`，只有 `.source-commit=1daafc5`；以上为提交建议，尚未创建提交。
+

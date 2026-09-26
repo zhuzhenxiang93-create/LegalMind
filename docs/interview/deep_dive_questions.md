@@ -69,3 +69,4 @@
 53. **CPU 或模型缺失怎么办？** 统一入口返回 `degraded_no_classifier/degraded_no_index/degraded_no_statute_index`，仍输出可解析 JSON。
 54. **实验如何复现？** 独立实验目录保存配置、数据 SHA256、环境、Manifest、指标和预测；历史目录不覆盖。
 55. **目前最该做什么？** 恢复官方 CAIL 原始字段和许可，其次是 200 条人工检索 qrels与生成测试集，再跑 Full 模型实验。
+

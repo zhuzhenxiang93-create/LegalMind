@@ -16,3 +16,4 @@ min_text_chars: 20
 max_boilerplate_chars: 120
 provenance_status: legacy_local_file_unverified
 source_url: null
+

@@ -57,3 +57,4 @@
   "recommended_gradient_accumulation_steps": 8,
   "selection_reason": "highest stable measured microbatch throughput with memory headroom"
 }
+

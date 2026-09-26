@@ -20,3 +20,4 @@ fusion_top_k: 20
 evaluation_k: 10
 rrf_k: 60
 seed: 42
+

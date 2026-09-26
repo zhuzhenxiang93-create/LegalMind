@@ -68,3 +68,4 @@ def near_duplicate_candidates(
             key = (band, (fingerprint >> (band * 16)) & 0xFFFF)
             buckets[key].append((row_id, fingerprint))
     return pairs
+

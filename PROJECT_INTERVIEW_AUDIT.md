@@ -1,7 +1,7 @@
 # LegalMind-RAG 项目审阅与面试手册
 
 审阅日期：2026-08-28（Pacific/Auckland）
-远程项目：`/root/autodl-tmp/LegalMind-RAG`
+远程项目：`/path/to/workspace/LegalMind-RAG`
 审阅方式：远程只读环境核验、源码/配置/测试/报告交叉检查、现有测试重跑
 
 ## 1. 一句话结论
@@ -20,7 +20,7 @@ LegalMind-RAG 是一个面向匿名化中国刑事案件事实的研究型原型
 | cgroup 内存 | 2 GiB，无 Swap |
 | 当前 GPU | 无；`torch.cuda.is_available() == False` |
 | 历史实验 GPU | NVIDIA RTX 4090 D，约 24 GiB |
-| 项目 Conda | `/root/autodl-tmp/conda/envs/legalmind` |
+| 项目 Conda | `/path/to/workspace/conda/envs/legalmind` |
 | Python | 3.11.15 |
 | PyTorch | 当前 2.6.0+cu124；旧文档记录 2.5.1+cu124 |
 | Transformers | 5.14.1 |
@@ -31,7 +31,7 @@ LegalMind-RAG 是一个面向匿名化中国刑事案件事实的研究型原型
 | 项目总大小 | 约 9.5 GiB |
 | 数据目录 | 约 2.3 GiB |
 | artifacts | 约 7.2 GiB |
-| 本地 Qwen3-4B 基座 | 约 7.6 GiB，位于项目目录外的 `/root/autodl-tmp/models/Qwen3-4B` |
+| 本地 Qwen3-4B 基座 | 约 7.6 GiB，位于项目目录外的 `/path/to/workspace/models/Qwen3-4B` |
 | 当前项目进程 | 无训练、评测或推理服务运行 |
 
 服务器常驻的只是 AutoDL 自身的 JupyterLab、TensorBoard、代理和 SSH 服务。项目没有部署为 Web API，也没有 Docker/Kubernetes/线上监控链路。
@@ -356,3 +356,4 @@ JSON 使用 Pydantic 校验；引用检查要求 `similar_cases.case_id` 和 `re
 - 用 Manifest/哈希区分真实结果与计划结果。
 
 把它描述成“严谨的研究型端到端原型”会很有说服力；把它描述成“已上线的法律智能平台”则风险很高。
+

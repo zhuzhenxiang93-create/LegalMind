@@ -97,3 +97,4 @@ v3.1 只从 train/validation 构造 4,500/550 条简化 JSON 数据。普通样�
 ## 24. 下一步
 
 当前 v2 Full QLoRA 已从 checkpoint-500 继续训练。GPU 释放后依次运行长文本受控消融、领域 Reranker Pilot 和 SFT v3.1 Pilot。200 条检索查询及人工审核 CSV 已生成，仍需要用户或法律专业人员实际审核；官方 CAIL 来源与法条字段仍需恢复。只有 SFT 后仍存在明确偏好错误时再做 DPO。
+

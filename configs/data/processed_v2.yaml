@@ -12,3 +12,4 @@ max_boilerplate_chars: 120
 near_duplicate_scan_rows: 20000
 simhash_hamming_threshold: 3
 max_near_duplicate_pairs: 5000
+

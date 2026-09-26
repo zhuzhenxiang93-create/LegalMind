@@ -1,0 +1,116 @@
+{
+  "mode": "Demo / Precomputed Mode",
+  "case_id": "insufficient-facts",
+  "classification_origin": "Illustrative manually authored scores; not checkpoint predictions",
+  "candidate_charges": [
+    {
+      "charge": "盗窃罪",
+      "confidence": 0.22,
+      "threshold": 0.5,
+      "above_threshold": false
+    },
+    {
+      "charge": "抢夺罪",
+      "confidence": 0.11,
+      "threshold": 0.5,
+      "above_threshold": false
+    }
+  ],
+  "retrieved_cases": [],
+  "legal_basis": [],
+  "analysis": {
+    "schema_version": "legal-analysis-v1",
+    "disposition": "insufficient_evidence",
+    "candidate_accusations": [
+      "盗窃罪",
+      "抢夺罪"
+    ],
+    "key_facts": [
+      "有人说自己的东西不见了，希望了解该如何分析。物品价值、保管关系、行为人和具体经过均不清楚。"
+    ],
+    "legal_basis": [],
+    "analogous_cases": [],
+    "sentencing_assessment": [],
+    "missing_information": [
+      "补充物品、价值、占有关系和具体行为经过",
+      "确认是否存在取财行为及可核实证据",
+      "核验法条官方正文与指定日期的有效版本"
+    ],
+    "confidence": "low",
+    "requires_manual_review": true,
+    "refusal_reason": "演示法条摘要尚未完成来源与时效核验，暂不生成法律或量刑结论。"
+  },
+  "checks": [
+    {
+      "name": "Schema Valid",
+      "status": "pass",
+      "detail": "LegalAnalysisV1 · Pydantic"
+    },
+    {
+      "name": "Citation Valid",
+      "status": "pass",
+      "detail": "No claims to validate"
+    },
+    {
+      "name": "Evidence Grounded",
+      "status": "pending",
+      "detail": "Synthetic excerpts copied with IDs; semantic correctness not assessed"
+    },
+    {
+      "name": "Statute Source Verified",
+      "status": "pending",
+      "detail": "Source link recorded; summary unverified"
+    },
+    {
+      "name": "Temporal Valid",
+      "status": "pending",
+      "detail": "No certified effective-date snapshot"
+    },
+    {
+      "name": "Privacy Check",
+      "status": "pass",
+      "detail": "Pattern redaction only; not comprehensive anonymization"
+    },
+    {
+      "name": "Manual Review Required",
+      "status": "review",
+      "detail": "Legal conclusions withheld"
+    }
+  ],
+  "trace": [
+    {
+      "name": "Charge classification",
+      "status": "precomputed",
+      "detail": "Illustrative fixture scores · no LoRA inference"
+    },
+    {
+      "name": "Charge-aware routing",
+      "status": "live",
+      "detail": "0 candidate charge partitions"
+    },
+    {
+      "name": "Case retrieval",
+      "status": "live",
+      "detail": "BM25 · Chinese character bigrams · 0 synthetic matches"
+    },
+    {
+      "name": "Statute lookup",
+      "status": "limited",
+      "detail": "Curated article mapping · unverified summaries"
+    },
+    {
+      "name": "Grounded output",
+      "status": "deterministic",
+      "detail": "Extractive case summaries · legal abstention"
+    },
+    {
+      "name": "Output validation",
+      "status": "live",
+      "detail": "Pydantic + Evidence-ID whitelist + review decision"
+    }
+  ],
+  "evidence_ids": [],
+  "elapsed_ms": 0.06,
+  "requires_manual_review": true,
+  "disclaimer": "Research / decision-support prototype, not legal advice."
+}

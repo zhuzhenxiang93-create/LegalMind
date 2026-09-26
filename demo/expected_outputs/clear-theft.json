@@ -1,0 +1,191 @@
+{
+  "mode": "Demo / Precomputed Mode",
+  "case_id": "clear-theft",
+  "classification_origin": "Illustrative manually authored scores; not checkpoint predictions",
+  "candidate_charges": [
+    {
+      "charge": "盗窃罪",
+      "confidence": 0.91,
+      "threshold": 0.5,
+      "above_threshold": true
+    },
+    {
+      "charge": "抢夺罪",
+      "confidence": 0.18,
+      "threshold": 0.5,
+      "above_threshold": false
+    }
+  ],
+  "retrieved_cases": [
+    {
+      "id": "SYN-003",
+      "charge": "盗窃",
+      "text": "秘密拿走他人手机，未使用暴力，返还手机，取得被害人谅解。",
+      "months": 5,
+      "fine": 1000,
+      "evidence_id": "SYN-003",
+      "score": 14.8292,
+      "origin": "synthetic"
+    },
+    {
+      "id": "SYN-001",
+      "charge": "盗窃",
+      "text": "商店柜台秘密拿走手机，价值5000元，事后返还并退赔，取得谅解。",
+      "months": 6,
+      "fine": 2000,
+      "evidence_id": "SYN-001",
+      "score": 12.7292,
+      "origin": "synthetic"
+    },
+    {
+      "id": "SYN-002",
+      "charge": "盗窃",
+      "text": "趁店员离开取走电子产品，价值6000元，主动退赔损失。",
+      "months": 8,
+      "fine": 3000,
+      "evidence_id": "SYN-002",
+      "score": 8.0624,
+      "origin": "synthetic"
+    }
+  ],
+  "legal_basis": [
+    {
+      "article": 264,
+      "charge": "盗窃",
+      "summary": "演示摘要：盗窃公私财物的相关规定；具体构成、情节与数额标准需核实。",
+      "evidence_id": "DEMO-ART-264",
+      "source_url": "https://www.stats.gov.cn/gk/tjfg/xgfxfg/202503/t20250311_1958931.html",
+      "source_status": "unverified_demo_summary",
+      "temporal_status": "not_verified",
+      "as_of_date": "2026-01-01"
+    },
+    {
+      "article": 267,
+      "charge": "抢夺",
+      "summary": "演示摘要：抢夺公私财物的相关规定；携带凶器抢夺的法律评价需单独核实。",
+      "evidence_id": "DEMO-ART-267",
+      "source_url": "https://www.stats.gov.cn/gk/tjfg/xgfxfg/202503/t20250311_1958931.html",
+      "source_status": "unverified_demo_summary",
+      "temporal_status": "not_verified",
+      "as_of_date": "2026-01-01"
+    }
+  ],
+  "analysis": {
+    "schema_version": "legal-analysis-v1",
+    "disposition": "insufficient_evidence",
+    "candidate_accusations": [
+      "盗窃罪",
+      "抢夺罪"
+    ],
+    "key_facts": [
+      "某成年人趁商店店员离开柜台，秘密拿走一部价值约5000元的手机并离开。事后返还手机、赔偿损失，并取得被害人[NAME_REDACTED]。未使用暴力或威胁。"
+    ],
+    "legal_basis": [],
+    "analogous_cases": [
+      {
+        "claim": "秘密拿走他人手机，未使用暴力，返还手机，取得被害人谅解。",
+        "evidence_ids": [
+          "SYN-003"
+        ]
+      },
+      {
+        "claim": "商店柜台秘密拿走手机，价值5000元，事后返还并退赔，取得谅解。",
+        "evidence_ids": [
+          "SYN-001"
+        ]
+      },
+      {
+        "claim": "趁店员离开取走电子产品，价值6000元，主动退赔损失。",
+        "evidence_ids": [
+          "SYN-002"
+        ]
+      }
+    ],
+    "sentencing_assessment": [],
+    "missing_information": [
+      "核实价格认定、行为人年龄及当地数额标准",
+      "核实退赔和谅解材料",
+      "核验法条官方正文与指定日期的有效版本"
+    ],
+    "confidence": "low",
+    "requires_manual_review": true,
+    "refusal_reason": "演示法条摘要尚未完成来源与时效核验，暂不生成法律或量刑结论。"
+  },
+  "checks": [
+    {
+      "name": "Schema Valid",
+      "status": "pass",
+      "detail": "LegalAnalysisV1 · Pydantic"
+    },
+    {
+      "name": "Citation Valid",
+      "status": "pass",
+      "detail": "Evidence-ID whitelist"
+    },
+    {
+      "name": "Evidence Grounded",
+      "status": "pass",
+      "detail": "Synthetic excerpts copied with IDs; semantic correctness not assessed"
+    },
+    {
+      "name": "Statute Source Verified",
+      "status": "pending",
+      "detail": "Source link recorded; summary unverified"
+    },
+    {
+      "name": "Temporal Valid",
+      "status": "pending",
+      "detail": "No certified effective-date snapshot"
+    },
+    {
+      "name": "Privacy Check",
+      "status": "pass",
+      "detail": "Pattern redaction only; not comprehensive anonymization"
+    },
+    {
+      "name": "Manual Review Required",
+      "status": "review",
+      "detail": "Legal conclusions withheld"
+    }
+  ],
+  "trace": [
+    {
+      "name": "Charge classification",
+      "status": "precomputed",
+      "detail": "Illustrative fixture scores · no LoRA inference"
+    },
+    {
+      "name": "Charge-aware routing",
+      "status": "live",
+      "detail": "2 candidate charge partitions"
+    },
+    {
+      "name": "Case retrieval",
+      "status": "live",
+      "detail": "BM25 · Chinese character bigrams · 3 synthetic matches"
+    },
+    {
+      "name": "Statute lookup",
+      "status": "limited",
+      "detail": "Curated article mapping · unverified summaries"
+    },
+    {
+      "name": "Grounded output",
+      "status": "deterministic",
+      "detail": "Extractive case summaries · legal abstention"
+    },
+    {
+      "name": "Output validation",
+      "status": "live",
+      "detail": "Pydantic + Evidence-ID whitelist + review decision"
+    }
+  ],
+  "evidence_ids": [
+    "SYN-001",
+    "SYN-002",
+    "SYN-003"
+  ],
+  "elapsed_ms": 0.8,
+  "requires_manual_review": true,
+  "disclaimer": "Research / decision-support prototype, not legal advice."
+}

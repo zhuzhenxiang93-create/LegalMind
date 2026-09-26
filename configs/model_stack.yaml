@@ -16,3 +16,4 @@ generator:
   role: grounded_report_generation
   deployment: alibaba_model_studio_api
   runtime_context_cap: 32768
+

@@ -1,0 +1,208 @@
+{
+  "mode": "Demo / Precomputed Mode",
+  "case_id": "ambiguous-taking",
+  "classification_origin": "Illustrative manually authored scores; not checkpoint predictions",
+  "candidate_charges": [
+    {
+      "charge": "抢夺罪",
+      "confidence": 0.48,
+      "threshold": 0.5,
+      "above_threshold": false
+    },
+    {
+      "charge": "抢劫罪",
+      "confidence": 0.44,
+      "threshold": 0.5,
+      "above_threshold": false
+    },
+    {
+      "charge": "盗窃罪",
+      "confidence": 0.31,
+      "threshold": 0.5,
+      "above_threshold": false
+    }
+  ],
+  "retrieved_cases": [
+    {
+      "id": "SYN-004",
+      "charge": "抢夺",
+      "text": "街边突然拿走他人手中的手机后离开，未发现针对人的暴力。",
+      "months": 10,
+      "fine": 2000,
+      "evidence_id": "SYN-004",
+      "score": 14.0925,
+      "origin": "synthetic"
+    },
+    {
+      "id": "SYN-005",
+      "charge": "抢劫",
+      "text": "街边使用暴力威胁被害人，强行拿走手机，被害人出现伤情。",
+      "months": 36,
+      "fine": 3000,
+      "evidence_id": "SYN-005",
+      "score": 9.3,
+      "origin": "synthetic"
+    },
+    {
+      "id": "SYN-006",
+      "charge": "抢夺",
+      "text": "突然夺走手中的物品，双方拉扯手机，事后退赔。",
+      "months": 9,
+      "fine": 2000,
+      "evidence_id": "SYN-006",
+      "score": 5.9061,
+      "origin": "synthetic"
+    }
+  ],
+  "legal_basis": [
+    {
+      "article": 264,
+      "charge": "盗窃",
+      "summary": "演示摘要：盗窃公私财物的相关规定；具体构成、情节与数额标准需核实。",
+      "evidence_id": "DEMO-ART-264",
+      "source_url": "https://www.stats.gov.cn/gk/tjfg/xgfxfg/202503/t20250311_1958931.html",
+      "source_status": "unverified_demo_summary",
+      "temporal_status": "not_verified",
+      "as_of_date": "2026-01-01"
+    },
+    {
+      "article": 267,
+      "charge": "抢夺",
+      "summary": "演示摘要：抢夺公私财物的相关规定；携带凶器抢夺的法律评价需单独核实。",
+      "evidence_id": "DEMO-ART-267",
+      "source_url": "https://www.stats.gov.cn/gk/tjfg/xgfxfg/202503/t20250311_1958931.html",
+      "source_status": "unverified_demo_summary",
+      "temporal_status": "not_verified",
+      "as_of_date": "2026-01-01"
+    },
+    {
+      "article": 263,
+      "charge": "抢劫",
+      "summary": "演示摘要：以暴力、胁迫或其他方法抢劫公私财物的相关规定。",
+      "evidence_id": "DEMO-ART-263",
+      "source_url": "https://www.stats.gov.cn/gk/tjfg/xgfxfg/202503/t20250311_1958931.html",
+      "source_status": "unverified_demo_summary",
+      "temporal_status": "not_verified",
+      "as_of_date": "2026-01-01"
+    }
+  ],
+  "analysis": {
+    "schema_version": "legal-analysis-v1",
+    "disposition": "insufficient_evidence",
+    "candidate_accusations": [
+      "抢夺罪",
+      "抢劫罪",
+      "盗窃罪"
+    ],
+    "key_facts": [
+      "某成年人在街边拿走他人手中的手机后离开。双方发生拉扯，但现有记录没有说明拉扯针对手机还是被害人，也不清楚是否存在威胁、伤情及先后顺序。"
+    ],
+    "legal_basis": [],
+    "analogous_cases": [
+      {
+        "claim": "街边突然拿走他人手中的手机后离开，未发现针对人的暴力。",
+        "evidence_ids": [
+          "SYN-004"
+        ]
+      },
+      {
+        "claim": "街边使用暴力威胁被害人，强行拿走手机，被害人出现伤情。",
+        "evidence_ids": [
+          "SYN-005"
+        ]
+      },
+      {
+        "claim": "突然夺走手中的物品，双方拉扯手机，事后退赔。",
+        "evidence_ids": [
+          "SYN-006"
+        ]
+      }
+    ],
+    "sentencing_assessment": [],
+    "missing_information": [
+      "补充拉扯对象、暴力程度及取财先后顺序",
+      "补充监控、证人及伤情信息",
+      "核验法条官方正文与指定日期的有效版本"
+    ],
+    "confidence": "low",
+    "requires_manual_review": true,
+    "refusal_reason": "演示法条摘要尚未完成来源与时效核验，暂不生成法律或量刑结论。"
+  },
+  "checks": [
+    {
+      "name": "Schema Valid",
+      "status": "pass",
+      "detail": "LegalAnalysisV1 · Pydantic"
+    },
+    {
+      "name": "Citation Valid",
+      "status": "pass",
+      "detail": "Evidence-ID whitelist"
+    },
+    {
+      "name": "Evidence Grounded",
+      "status": "pass",
+      "detail": "Synthetic excerpts copied with IDs; semantic correctness not assessed"
+    },
+    {
+      "name": "Statute Source Verified",
+      "status": "pending",
+      "detail": "Source link recorded; summary unverified"
+    },
+    {
+      "name": "Temporal Valid",
+      "status": "pending",
+      "detail": "No certified effective-date snapshot"
+    },
+    {
+      "name": "Privacy Check",
+      "status": "pass",
+      "detail": "Pattern redaction only; not comprehensive anonymization"
+    },
+    {
+      "name": "Manual Review Required",
+      "status": "review",
+      "detail": "Legal conclusions withheld"
+    }
+  ],
+  "trace": [
+    {
+      "name": "Charge classification",
+      "status": "precomputed",
+      "detail": "Illustrative fixture scores · no LoRA inference"
+    },
+    {
+      "name": "Charge-aware routing",
+      "status": "live",
+      "detail": "3 candidate charge partitions"
+    },
+    {
+      "name": "Case retrieval",
+      "status": "live",
+      "detail": "BM25 · Chinese character bigrams · 3 synthetic matches"
+    },
+    {
+      "name": "Statute lookup",
+      "status": "limited",
+      "detail": "Curated article mapping · unverified summaries"
+    },
+    {
+      "name": "Grounded output",
+      "status": "deterministic",
+      "detail": "Extractive case summaries · legal abstention"
+    },
+    {
+      "name": "Output validation",
+      "status": "live",
+      "detail": "Pydantic + Evidence-ID whitelist + review decision"
+    }
+  ],
+  "evidence_ids": [
+    "SYN-004",
+    "SYN-005",
+    "SYN-006"
+  ],
+  "elapsed_ms": 0.87,
+  "requires_manual_review": true,
+  "disclaimer": "Research / decision-support prototype, not legal advice."
+}

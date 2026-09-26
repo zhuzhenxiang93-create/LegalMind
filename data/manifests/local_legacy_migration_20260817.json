@@ -1,6 +1,6 @@
 {
   "created_at_utc": "2026-08-17T10:21:00Z",
-  "destination": "/root/autodl-tmp/LegalMind-RAG/data/local_legacy",
+  "destination": "/path/to/workspace/LegalMind-RAG/data/local_legacy",
   "provenance_status": "legacy_local_file_unverified",
   "included": [
     {
@@ -52,3 +52,4 @@
     "remote_match": true
   }
 }
+

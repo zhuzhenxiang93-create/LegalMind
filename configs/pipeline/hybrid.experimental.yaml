@@ -1,0 +1,41 @@
+classifier:
+  enabled: true
+  base_model: Qwen/Qwen3-4B
+  adapter: artifacts/models/classifier/checkpoint-7500
+  label_mapping: artifacts/models/classifier/label_mapping.json
+  thresholds: artifacts/models/classifier/thresholds.json
+  max_length: 2048
+  truncation_strategy: head_tail
+retrieval:
+  mode: hybrid_rrf_rerank
+  hybrid_index: artifacts/indexes/cail2018-v2_1_1
+  candidate_k: 100
+  fusion_top_k: 50
+  rerank_top_k: 20
+  rrf_k: 60
+  reranker_provider: api
+  reranker_model: qwen3-rerank
+  reranker_url_env: DASHSCOPE_RERANK_URL
+  reranker_api_key_env: DASHSCOPE_API_KEY
+  reranker_timeout: 60
+  reranker_instruction: Rank Chinese criminal cases by factual conduct, charge elements,
+    and applicable statutes for evidence-grounded legal analysis.
+  partitioned_index: artifacts/indexes/case_retrieval_by_charge
+  bm25_index: artifacts/experiments/bm25_sparse64_eval_v2/index
+  statute_bm25_index: artifacts/indexes/statutes_bm25_temporal_v3
+  top_k: 3
+generation:
+  mode: openai_compatible_grounded
+  model: qwen-plus
+  base_url_env: GENERATION_BASE_URL
+  api_key_env: GENERATION_API_KEY
+  max_tokens: 2048
+  temperature: 0.0
+  top_p: 0.8
+  top_k: 20
+  max_repairs: 1
+  require_citation_validation: true
+sentencing:
+  enabled: false
+  model_dir: artifacts/models/sentencing_baseline_v1_2
+  evidence_dir: artifacts/indexes/sentencing_evidence_v1_2

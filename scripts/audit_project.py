@@ -89,7 +89,7 @@ def main() -> None:
                 "--format=csv,noheader",
             ]
         ),
-        "disk": command_output(["df", "-h", "/root/autodl-tmp"]),
+        "disk": command_output(["df", "-h", "/path/to/workspace"]),
     }
     repository = {
         "root": str(Path.cwd()),

@@ -31,3 +31,4 @@ def iter_cases(
 ) -> Iterator[CaseRecord]:
     for raw in iter_jsonl(path):
         yield normalize_record(raw, source_split=source_split, label_to_id=label_to_id)
+

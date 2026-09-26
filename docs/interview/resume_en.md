@@ -8,3 +8,4 @@
 - Added strict JSON contracts, retrieval-grounded citation validation, low-confidence fallback, and mandatory human-review controls; converted generation failures into explicit bad-case categories and defined evidence-based entry criteria for full SFT and any later DPO work.
 
 > The 0.8296 result belongs to the preserved historical stratified 10K experiment, not the unrun v2 full-data experiment. Dataset-license and proxy-qrels limitations are documented in the repository.
+

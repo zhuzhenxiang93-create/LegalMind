@@ -4,3 +4,4 @@ output_dir: data/reranker
 queries: 5000
 negatives_per_query: 3
 seed: 42
+

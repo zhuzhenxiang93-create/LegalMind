@@ -1,0 +1,21 @@
+{
+  "id": "insufficient-facts",
+  "title": "03 · 信息不足",
+  "subtitle": "Abstention · request more information",
+  "fact": "有人说自己的东西不见了，希望了解该如何分析。物品价值、保管关系、行为人和具体经过均不清楚。",
+  "scores": [
+    [
+      "盗窃",
+      0.22
+    ],
+    [
+      "抢夺",
+      0.11
+    ]
+  ],
+  "uncertain": true,
+  "missing": [
+    "补充物品、价值、占有关系和具体行为经过",
+    "确认是否存在取财行为及可核实证据"
+  ]
+}

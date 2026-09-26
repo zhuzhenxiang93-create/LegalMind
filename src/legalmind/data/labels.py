@@ -33,3 +33,4 @@ def save_label_mapping(mapping: dict[str, int], path: str | Path) -> None:
 def build_label_mapping(label_sets: list[list[str]]) -> dict[str, int]:
     labels = sorted({label for values in label_sets for label in values})
     return {label: index for index, label in enumerate(labels)}
+

@@ -48,3 +48,4 @@
   },
   "caveat": "The 2K evaluation subsets are coverage-first stratified samples and do not preserve the untouched test distribution. Replace these values with a full 15,033-row test evaluation after full-data training."
 }
+

@@ -35,9 +35,9 @@ Training was then resumed from `checkpoint-500` in detached screen session `lega
 Recovery command:
 
 ```bash
-cd /root/autodl-tmp/LegalMind-RAG
+cd /path/to/workspace/LegalMind-RAG
 env OMP_NUM_THREADS=8 PYTHONPATH=src \
-  /root/autodl-tmp/conda/envs/legalmind/bin/python scripts/train_qlora.py \
+  /path/to/workspace/conda/envs/legalmind/bin/python scripts/train_qlora.py \
   --training-config configs/classification/qwen3_4b_qlora_full.yaml \
   --resume-from-checkpoint
 ```
@@ -47,3 +47,4 @@ Live log:
 `artifacts/experiments/qwen3_4b_qlora_v2_full/resume_20260821.log`
 
 The final training time, peak memory, throughput, best checkpoint, and validation Micro-F1 remain `pending_running`. The final test evaluation remains `not_run` until the validation configuration is frozen.
+

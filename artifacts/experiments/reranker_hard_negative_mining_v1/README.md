@@ -8,3 +8,4 @@ Reproduction command:
 OMP_NUM_THREADS=4 PYTHONPATH=src python scripts/build_reranker_data.py \
   --queries 5000 --negatives-per-query 3 --seed 42
 ```
+

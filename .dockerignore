@@ -1,0 +1,10 @@
+.git
+.env
+.venv
+**/__pycache__
+app/frontend/node_modules
+app/frontend/dist
+artifacts
+data
+reports
+upload

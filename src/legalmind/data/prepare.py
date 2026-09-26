@@ -50,3 +50,4 @@ def merge_case_labels(target: CaseRecord, incoming: CaseRecord) -> bool:
         set(target.relevant_articles) | set(incoming.relevant_articles)
     )
     return conflict
+
