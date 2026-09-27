@@ -2,7 +2,7 @@
 
 | Mode | Classification | Retrieval | Generation | Verification |
 |---|---|---|---|---|
-| Bailian API Demo (`lite`) | Exact preset → illustrative scores | BM25 + API Dense → RRF → API Reranker over six synthetic records | Qwen-Plus with Evidence Packet | Offline mock HTTP contract tests |
+| Bailian API Demo (`lite`) | Exact preset → illustrative scores | BM25 + API Dense → RRF → API Reranker over six synthetic records | Qwen-Plus with Evidence Packet | Three live presets + offline HTTP tests |
 | Full | Qwen3-4B BF16 LoRA | Same strict Hybrid chain over a matching private index | Qwen-Plus with case/statute evidence | Components tested; private assets and live credentials absent |
 
 React/Vite talks to FastAPI through a same-origin `/api` proxy. Only the backend reads `.env`. `/api/capabilities` checks configuration and asset presence, not provider operational readiness. `/api/analyze` validates 5–8,000 characters and an as-of date. Application code does not persist submitted facts; configured provider calls send redacted query/evidence text to Bailian.
@@ -13,4 +13,4 @@ Demo statute summaries lack verified source/date metadata and are excluded from 
 
 Full Mode preflights the matching API embedding model/dimensions in its index manifest and requires the BF16 assets and statute index. Loading is lazy and cached; restart after changes. The traditional sentencing baseline is disabled by default.
 
-The production service never imports the offline mock provider. Stored test outputs and screenshots are explicitly labelled mock API contract previews, with live provider validation pending.
+The production service never imports the offline mock provider. Stored test outputs and screenshots are explicitly labelled mock API contract previews, with the separate live check documented in [Bailian validation](bailian-live-validation.md).

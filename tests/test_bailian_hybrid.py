@@ -31,6 +31,8 @@ def test_http_contract_and_charge_gated_rankings(bailian_mock):
     assert rerank["model"] == "qwen3-rerank" and "instruct" in rerank and "input" not in rerank
     assert chat["model"] == "qwen-plus" and chat["enable_thinking"] is False
     assert chat["response_format"] == {"type": "json_object"}
+    assert chat["messages"][0]["role"] == "system"
+    assert 'disposition="insufficient_evidence"' in chat["messages"][-1]["content"]
     allowed = {r["id"] for r in RECORDS if r["charge"] in trace["charge_filter"]}
     for stage in ["bm25", "dense", "rrf", "reranker"]:
         assert trace[stage]

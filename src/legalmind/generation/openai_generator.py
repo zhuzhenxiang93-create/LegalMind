@@ -29,6 +29,11 @@ class OpenAICompatibleGenerator:
             )
         except ImportError:
             self.client = None
+        self.system_prompt = config.get("system_prompt")
+        if not self.system_prompt and config.get("mode") == "openai_compatible_grounded":
+            from legalmind.generation.analysis_service import SYSTEM_PROMPT_V2
+
+            self.system_prompt = SYSTEM_PROMPT_V2
         self.model = config["model"]
         self.max_tokens = int(config.get("max_tokens", 4096))
         self.temperature = float(config.get("temperature", 0.7))
@@ -42,9 +47,13 @@ class OpenAICompatibleGenerator:
         self.timeout_seconds = float(config.get("timeout_seconds", 120))
 
     def generate(self, prompt: str) -> str:
+        messages = []
+        if self.system_prompt:
+            messages.append({"role": "system", "content": self.system_prompt})
+        messages.append({"role": "user", "content": prompt})
         payload = {
             "model": self.model,
-            "messages": [{"role": "user", "content": prompt}],
+            "messages": messages,
             "max_tokens": self.max_tokens,
             "temperature": self.temperature,
             "top_p": self.top_p,

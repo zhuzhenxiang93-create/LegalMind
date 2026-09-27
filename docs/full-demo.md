@@ -1,6 +1,6 @@
 # Full Demo
 
-Full Mode reuses `LegalMindPipeline`, the BF16 classifier, strict Hybrid retrieval, temporal statute filtering, Evidence Packet and OpenAI-compatible generation. This release exercised mocked provider/component tests through mocked HTTP transport; it did not run the external BF16 checkpoint or paid generation service.
+Full Mode reuses `LegalMindPipeline`, the BF16 classifier, strict Hybrid retrieval, temporal statute filtering, Evidence Packet and OpenAI-compatible generation. This release exercised mocked provider/component tests through mocked HTTP transport; the API Demo subsequently passed a three-preset live Bailian check. Full BF16/private-corpus execution remains unverified.
 
 ## Assets
 
@@ -40,7 +40,7 @@ The public release includes no case corpus, weights or distributable adapter. Da
 `LEGALMIND_HYBRID_INDEX` must point to a saved HybridIndex built with `embedding_provider: api`, the configured `text-embedding-v4` model and 1,024 dimensions. Rebuild old local/Qwen embedding indexes: vectors from different models cannot be mixed. Configure Bailian as described in [Hybrid setup](hybrid-demo.md). Full Mode uses `qwen3-rerank` and `qwen-plus` through the same backend credentials.
 The default `full_config()` and `configs/pipeline/default.yaml` require Hybrid and a reranker. Missing components raise an explicit error, with no sparse fallback. The legacy filename `hybrid.experimental.yaml` is retained for compatibility; it now also uses strict Hybrid. Research configurations can still explicitly opt into older fallback behavior, but the recruiting default cannot.
 
-A full Qwen/private-corpus run still requires separately provided weights, index and credentials. Offline tests verify the HTTP contracts and retrieval algorithms using synthetic provider responses. Live API inference and private-corpus quality remain unverified.
+A full Qwen/private-corpus run still requires separately provided weights, index and credentials. Offline tests verify the HTTP contracts and retrieval algorithms using synthetic provider responses. The API Demo live check is documented separately; private-corpus quality remains unverified.
 
 ## Docker boundary
 

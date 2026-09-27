@@ -26,8 +26,8 @@ See [results.json](../demo/evaluation/results.json) for current results. Outputs
 
 Tests also exercise missing keys, embedding/reranker outages with no sparse fallback, provider-error sanitization, invalid citations and one-repair generation fallback. CI makes no paid provider calls. The frontend is built and exercised using visibly labelled mock responses, plus missing-configuration checks.
 
-For a live run, configure `.env` and run `python scripts/evaluate_demo.py`. This consumes provider quota and writes separate ignored `live-results.json` and `live-outputs.jsonl`. A local live run was not possible because no credentials were supplied. Full BF16/private-corpus inference and Docker execution also remain unverified.
+For a live run, configure `.env` and run `python scripts/evaluate_demo.py`. This consumes provider quota and writes separate ignored `live-results.json` and `live-outputs.jsonl`. A separate [three-preset live run](bailian-live-validation.md) succeeded on 2026-09-27 after correcting system-level evidence instructions. Full BF16/private-corpus inference and Docker execution also remain unverified.
 
 ## Next evaluation gates
 
-Run the live API contract check, then corrected independent BF16 Test, verify statute snapshots, collect legal-reviewer relevance labels and compare Hybrid against BM25. Keep structural correctness, model quality, useful answering and abstention quality as separate measures.
+Expand live API evaluation, then run corrected independent BF16 Test, verify statute snapshots, collect legal-reviewer relevance labels and compare Hybrid against BM25. Keep structural correctness, model quality, useful answering and abstention quality as separate measures.

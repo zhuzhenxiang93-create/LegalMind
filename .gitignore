@@ -62,3 +62,5 @@ dist/
 # Live provider evaluations stay local for review.
 demo/evaluation/live-results.json
 demo/evaluation/live-outputs.jsonl
+
+demo/evaluation/live-progress.jsonl

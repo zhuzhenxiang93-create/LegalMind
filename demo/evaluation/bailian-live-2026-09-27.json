@@ -1,0 +1,60 @@
+{
+  "execution_mode": "live_api",
+  "run_date_utc": "2026-09-27",
+  "as_of_date": "2026-01-01",
+  "scope": "Three synthetic presets; illustrative classifier; no verified statute evidence",
+  "models": {
+    "embedding": "text-embedding-v4",
+    "reranker": "qwen3-rerank",
+    "generation": "qwen-plus"
+  },
+  "samples": 3,
+  "schema_valid": 3,
+  "citation_valid": 3,
+  "generation_live": 3,
+  "generation_fallback": 0,
+  "hybrid_live": 2,
+  "hybrid_skipped": 1,
+  "cases": [
+    {
+      "case_id": "clear-theft",
+      "elapsed_ms": 31999.8,
+      "generation_attempts": 1,
+      "generation_status": "live_api",
+      "disposition": "insufficient_evidence",
+      "retrieved_ids": [
+        "SYN-003",
+        "SYN-001",
+        "SYN-002"
+      ]
+    },
+    {
+      "case_id": "ambiguous-taking",
+      "elapsed_ms": 39563.08,
+      "generation_attempts": 1,
+      "generation_status": "live_api",
+      "disposition": "insufficient_evidence",
+      "retrieved_ids": [
+        "SYN-006",
+        "SYN-005",
+        "SYN-004"
+      ]
+    },
+    {
+      "case_id": "insufficient-facts",
+      "elapsed_ms": 10778.69,
+      "generation_attempts": 1,
+      "generation_status": "live_api",
+      "disposition": "insufficient_evidence",
+      "retrieved_ids": []
+    }
+  ],
+  "limitations": [
+    "Synthetic presets with illustrative classification; BF16 classifier inference was not exercised.",
+    "No verified statutes; all outputs deliberately abstain from legal conclusions.",
+    "Citation membership includes empty-citation responses; it does not prove semantic or legal correctness.",
+    "Single run through this execution environment; timings are not a production latency benchmark."
+  ],
+  "total_citations": 6,
+  "unknown_evidence_id_count": 0
+}

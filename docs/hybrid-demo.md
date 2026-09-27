@@ -32,7 +32,7 @@ Chat uses `qwen-plus`, `enable_thinking=false` and `response_format={"type":"jso
 
 ## Verification boundary
 
-No provider credentials were available during this release. Offline tests use `httpx.MockTransport` around the real OpenAI SDK and HTTP reranker client. BM25, vector search, filtering, RRF, response-index mapping and output validation execute normally over synthetic data. Mock vectors and generated text do not measure model quality or live service compatibility.
+Live validation of the three synthetic presets is recorded in [the 2026-09-27 report](bailian-live-validation.md). Offline tests use `httpx.MockTransport` around the real OpenAI SDK and HTTP reranker client. BM25, vector search, filtering, RRF, response-index mapping and output validation execute normally over synthetic data. Mock vectors and generated text do not measure model quality or live service compatibility.
 
 ```bash
 python scripts/evaluate_demo.py --mock-provider  # offline, no provider charge

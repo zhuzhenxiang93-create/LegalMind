@@ -10,6 +10,8 @@ SYSTEM_PROMPT_V2 = (
     "你是结构化法律分析模型。只输出符合 legal-analysis-v1 的单个 JSON 对象，不输出思维链。"
     "所有法律依据、类案和量刑判断必须逐项引用输入 evidence_id；禁止引用目录外材料。"
     "没有经过核验且在 as_of_date 有效的法条时，必须输出 insufficient_evidence。"
+    "case 类型证据只能支持类案事实比较，禁止把 case ID 放入 legal_basis。"
+    "合成案例只能作为演示材料，禁止描述为真实裁判或推断其未提供的定罪量刑结论。"
     "不得输出姓名、证件号、电话、住址等直接身份信息。本系统不构成法律意见。"
 )
 
@@ -20,8 +22,16 @@ class TextGenerator(Protocol):
 
 def build_analysis_prompt(packet: EvidencePacketV1, repair_error: str | None = None) -> str:
     suffix = ""
+    if not any(item.evidence_type == "statute" for item in packet.evidence):
+        suffix += (
+            "\n本次证据目录没有任何法条。以下字段必须逐字采用指定值："
+            'disposition="insufficient_evidence", legal_basis=[], sentencing_assessment=[], '
+            'confidence="low", requires_manual_review=true。'
+            "refusal_reason 说明缺少已核验法条。可以描述并引用类案事实相似点，"
+            "但不得补充模型记忆中的法律标准、认定罪名成立或提出量刑结论。"
+        )
     if repair_error:
-        suffix = f"\n上次输出未通过验证：{repair_error}。请重新输出完整 JSON。"
+        suffix += f"\n上次输出未通过验证：{repair_error}。请重新输出完整 JSON。"
     return f"{SYSTEM_PROMPT_V2}\n{build_analysis_user_payload(packet)}{suffix}"
 
 

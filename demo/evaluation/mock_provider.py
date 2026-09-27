@@ -56,7 +56,7 @@ class MockBailian:
                 },
             )
         if request.url.path.endswith("/chat/completions"):
-            prompt = payload["messages"][0]["content"]
+            prompt = payload["messages"][-1]["content"]
             packet = json.loads(
                 prompt.split("INPUT_EVIDENCE_PACKET=", 1)[1].split("\nOUTPUT_SCHEMA=", 1)[0]
             )

@@ -28,7 +28,7 @@ Charge classification alone leaves the reviewer without supporting evidence. Fre
 
 The UI explicitly displays **Bailian API / precomputed classification**. Classification scores are manually authored illustrations, not checkpoint predictions. Retrieval calls `text-embedding-v4` and `qwen3-rerank`; generation calls `qwen-plus`. BM25 and RRF execute locally. Edited/free-text inputs do not inherit preset scores and require Full Mode for classifier inference.
 
-**Verification status:** HTTP contract tests use a mock provider. No Bailian key was available for this release, so live API availability, paid inference quality and latency remain unverified. Saved example outputs and result screenshots are explicitly marked mock contract fixtures.
+**Verification status:** [Live Bailian validation on 2026-09-27](docs/bailian-live-validation.md) completed all three synthetic presets with valid output and zero final-run generation fallbacks. Two presets exercised the complete Hybrid chain; the insufficient-facts preset skipped retrieval. Earlier diagnostics exposed a case-as-law generation error, corrected through system-level evidence instructions. The 30-request regression and screenshots remain explicitly marked mock fixtures.
 
 Demo statute summaries have a recorded official-source URL but have **not** been verified against a dated authoritative text. All Lite scenarios therefore withhold legal/sentencing conclusions and require review. This is a transparent walkthrough of the workflow, not a validated legal answer demo.
 
@@ -173,10 +173,10 @@ The [30-request mock API contract regression](demo/evaluation/results.json) chec
 | Component | Status |
 |---|---|
 | Qwen3-4B BF16 LoRA | Implemented; external checkpoint required |
-| Charge-aware BM25 + Dense | Default; Bailian API adapter; mock HTTP tests |
-| RRF / neural Reranker | Default; mock HTTP contract E2E tested |
+| Charge-aware BM25 + Dense | Default; Bailian API; two live Hybrid presets validated |
+| RRF / neural Reranker | Default; live synthetic presets + mock HTTP tests |
 | Statute retrieval and temporal filters | Implemented; verified source metadata required |
-| Evidence Packet / OpenAI-compatible generation | Implemented; provider tests use mocks |
+| Evidence Packet / OpenAI-compatible generation | Three live synthetic presets validated |
 | Pydantic / Evidence-ID whitelist | Implemented and regression-tested |
 | Recruiting Web UI / Lite | Implemented and browser-tested |
 | Generation SFT | Historical / experimental |
@@ -212,7 +212,7 @@ Full Mode fails explicitly if required assets are absent. API Demo needs the Bai
 
 **Training data is not redistributed by this repository.** The inherited CAIL-derived source is recorded as `legacy_local_file_unverified`; the source/license chain needs verification before redistribution or adapter release. Full model artifacts are not redistributed. Public demo cases are authored synthetic fixtures.
 
-The prototype is not deployed as a public production service. It lacks a human-reviewed legal benchmark, demonstrated legal-answer reliability, broad privacy guarantees, hosted GPU inference and live Bailian E2E validation. The demo is intentionally conservative about statute provenance. Old documents under `reports/` and research notes describe historical runs; this README and the release audit define the recruiting release.
+The prototype is not deployed as a public production service. It lacks a human-reviewed legal benchmark, demonstrated legal-answer reliability, broad privacy guarantees and hosted GPU inference. The demo is intentionally conservative about statute provenance. Old documents under `reports/` and research notes describe historical runs; this README and the release audit define the recruiting release.
 
 ## Roadmap
 
