@@ -14,6 +14,22 @@ A research prototype that turns anonymized case facts into candidate charges, tr
 
 [Try the demo](#quick-start) · [Architecture](docs/architecture.md) · [Evaluation](docs/evaluation.md) · [Full Mode](docs/full-demo.md)
 
+## Product at a glance
+
+| Dimension | Product design |
+|---|---|
+| **User need** | Turn anonymized case facts into a reviewable first-pass analysis with traceable evidence, explicit uncertainty and clear manual-review boundaries. |
+| **Core workflow** | Case facts → candidate charges → charge-aware case retrieval → statute evidence → Evidence Packet → structured generation → validation / manual review. |
+| **Key product decision** | Separate evidence retrieval from generation, expose Evidence IDs, and fail closed when required support is missing. |
+| **AI stack** | Qwen3-4B BF16 LoRA classifier, BM25 + neural Dense recall, RRF, neural Reranker and OpenAI-compatible grounded generation. |
+| **Trust & safety** | Synthetic public demo cases, explicit evidence validation, abstention/manual review, privacy redaction and a clear research-only disclaimer. |
+
+## Recruiter 3-minute tour
+
+1. Open the Product Demo and compare the clear-facts, competing-charges and insufficient-facts scenarios.
+2. Inspect Pipeline Trace to see how classification, constrained retrieval, evidence construction and validation interact.
+3. Open Evaluation to see what has been measured, what is still pending, and which results are intentionally not presented as production/legal reliability.
+
 ## Why LegalMind-RAG?
 
 Charge classification alone leaves the reviewer without supporting evidence. Free-form generation makes it difficult to inspect where a claim came from. This prototype connects domain classification, charge-constrained retrieval, explicit Evidence IDs and validation, while exposing uncertainty and missing information.
